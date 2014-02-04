@@ -19,7 +19,8 @@
 
 <module rename-to="app">
 
-
+    <inherits name="com.google.gwt.junit.JUnit"/>
+    <inherits name="org.jboss.errai.ui.UI"/>
     <inherits name="com.google.gwt.i18n.I18N"/>
     <inherits name="com.google.gwt.json.JSON"/>
     <inherits name='com.google.gwt.visualization.Visualization'/>

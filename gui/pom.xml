@@ -19,6 +19,7 @@
 
     <properties>
         <console.profile>jboss</console.profile>
+        <errai.version>3.0-SNAPSHOT</errai.version>
     </properties>
 
 
@@ -32,11 +33,40 @@
                 <version>${project.version}</version>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.jboss.errai.bom</groupId>
+                <artifactId>errai-version-master</artifactId>
+                <version>${errai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.errai</groupId>
+                <artifactId>errai-parent</artifactId>
+                <version>${errai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-data-binding</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-dmr</artifactId>

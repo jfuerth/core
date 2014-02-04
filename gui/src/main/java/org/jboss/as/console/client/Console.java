@@ -38,6 +38,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import javax.enterprise.inject.Produces;
 import org.jboss.as.console.client.core.AsyncCallHandler;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.LoadingPanel;
@@ -81,6 +82,7 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
+    @Produces
     public final static ProductConfig prodConfig = GWT.create(ProductConfig.class);
 
     public void onModuleLoad() {
