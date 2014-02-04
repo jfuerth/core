@@ -148,6 +148,7 @@
                     <disableCastChecking>true</disableCastChecking>
                     <disableClassMetadata>true</disableClassMetadata>
                     <enableClosureCompiler>true</enableClosureCompiler>
+                    <strict>true</strict>
                 </configuration>
                 <executions>
                     <execution>
