@@ -17,6 +17,7 @@ import org.jboss.as.console.client.domain.model.HostInformationStore;
 import org.jboss.as.console.client.domain.model.Server;
 import org.jboss.as.console.client.domain.model.ServerInstance;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 
 /**
@@ -41,9 +42,9 @@ public class DomainEntityManager implements
     private final BeanFactory factory;
 
     @Inject
-    public DomainEntityManager(HostInformationStore hostInfo, EventBus eventBus, BeanFactory factory) {
+    public DomainEntityManager(HostInformationStore hostInfo, @POC BeanFactory factory) {
         this.hostInfo = hostInfo;
-        this.eventBus = eventBus;
+        this.eventBus = Console.getEventBus();
         this.factory = factory;
 
         eventBus.addHandler(GlobalHostSelection.TYPE, this);

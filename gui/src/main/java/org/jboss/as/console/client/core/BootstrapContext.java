@@ -32,6 +32,7 @@ import com.google.gwt.user.client.Window;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import org.jboss.as.console.client.ProductConfig;
 import org.jboss.as.console.client.domain.model.ProfileRecord;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.StandardRole;
 
 /**
@@ -55,7 +56,7 @@ public class BootstrapContext implements ApplicationProperties {
     private List<ProfileRecord> initialProfiles;
 
     @Inject
-    public BootstrapContext(ProductConfig productConfig) {
+    public BootstrapContext(@POC ProductConfig productConfig) {
 
         // Default values
         this.productName = "Management Console";

@@ -19,7 +19,7 @@
 
     <properties>
         <console.profile>jboss</console.profile>
-        <errai.version>3.0-SNAPSHOT</errai.version>
+        <errai.version>3.0.0.20131205-M3</errai.version>
     </properties>
 
 
