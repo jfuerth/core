@@ -19,6 +19,7 @@
 
 package org.jboss.as.console.client.poc;
 
+import com.google.gwt.core.client.GWT;
 import org.jboss.as.console.client.ProductConfig;
 
 /**
@@ -28,34 +29,36 @@ import org.jboss.as.console.client.ProductConfig;
 @POC
 public class ProductConfigPOC implements ProductConfig {
 
+    private static final ProductConfig generated = GWT.create(ProductConfig.class);
+
     @Override
     public Profile getProfile() {
-        return Profile.COMMUNITY;
+        return generated.getProfile();
     }
 
     @Override
     public String getCoreVersion() {
-        return "Core Version POC.0.1";
+        return generated.getCoreVersion();
     }
 
     @Override
     public String getConsoleVersion() {
-        return "Console Version POC.0.1";
+        return generated.getConsoleVersion();
     }
 
     @Override
     public String getProductName() {
-        return "Product Name: POC";
+        return generated.getProductName();
     }
 
     @Override
     public String getProductVersion() {
-        return "8.0.0.Alpha1-SNAPSHOT";
+        return generated.getProductVersion();
     }
 
     @Override
     public String getDevHost() {
-        return "127.0.0.1:8888";
+        return generated.getDevHost();
     }
 
 }

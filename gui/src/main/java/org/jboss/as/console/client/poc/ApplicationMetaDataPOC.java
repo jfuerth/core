@@ -19,7 +19,9 @@
 
 package org.jboss.as.console.client.poc;
 
+import com.google.gwt.core.client.GWT;
 import java.util.List;
+import javax.inject.Inject;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityFactory;
@@ -34,29 +36,31 @@ import org.jboss.as.console.client.widgets.forms.PropertyBinding;
 @POC
 public class ApplicationMetaDataPOC implements ApplicationMetaData {
 
+    private static final ApplicationMetaData generated = GWT.create(ApplicationMetaData.class); //new org.jboss.as.console.client.widgets.forms.ApplicationMetaDataImpl();
+
     @Override
     public List<PropertyBinding> getBindingsForType(Class<?> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return generated.getBindingsForType(type);
     }
 
     @Override
     public BeanMetaData getBeanMetaData(Class<?> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return generated.getBeanMetaData(type);
     }
 
     @Override
     public Mutator getMutator(Class<?> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return generated.getMutator(type);
     }
 
     @Override
     public <T> EntityFactory<T> getFactory(Class<T> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return generated.getFactory(type);
     }
 
     @Override
     public FormMetaData getFormMetaData(Class<?> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return generated.getFormMetaData(type);
     }
 
 }

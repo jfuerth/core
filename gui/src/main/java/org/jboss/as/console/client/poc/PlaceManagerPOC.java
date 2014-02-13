@@ -25,6 +25,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.SetPlaceTitleHandler;
 import java.util.List;
+import javax.inject.Inject;
+import org.jboss.as.console.client.core.DefaultPlaceManager;
 
 /**
  *
@@ -32,6 +34,15 @@ import java.util.List;
  */
 @POC
 public class PlaceManagerPOC implements PlaceManager {
+
+    //@Inject
+    //private DefaultPlaceManager delegate;
+
+//    public PlaceManagerPOC() {
+//        System.out.println("*****************");
+//        System.out.println("PlaceManager delegate=" + delegate.getClass().getName());
+//        System.out.println("*****************");
+//    }
 
     @Override
     public void fireEvent(GwtEvent<?> event) {

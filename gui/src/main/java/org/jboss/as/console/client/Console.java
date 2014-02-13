@@ -60,6 +60,7 @@ import org.jboss.as.console.client.core.message.Message;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
+import org.jboss.as.console.client.poc.ProductConfigPOC;
 import org.jboss.as.console.client.shared.Preferences;
 import org.jboss.as.console.client.shared.help.HelpSystem;
 import org.jboss.as.console.client.shared.state.ReloadNotification;
@@ -82,8 +83,7 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
-    @Produces
-    public final static ProductConfig prodConfig = GWT.create(ProductConfig.class);
+    public final static ProductConfig prodConfig = new ProductConfigPOC(); //GWT.create(ProductConfig.class);
 
     public void onModuleLoad() {
         Log.setUncaughtExceptionHandler();
