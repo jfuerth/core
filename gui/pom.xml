@@ -20,6 +20,7 @@
     <properties>
         <console.profile>jboss</console.profile>
         <errai.version>3.0.0.20131205-M3</errai.version>
+        <uberfire.version>0.5.0-SNAPSHOT</uberfire.version>
     </properties>
 
 
@@ -49,6 +50,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+			<dependency>
+				<groupId>org.uberfire</groupId>
+				<artifactId>uberfire-bom</artifactId>
+				<version>${uberfire.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -62,6 +72,29 @@
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-data-binding</artifactId>
         </dependency>
+
+	    <dependency>
+	      <groupId>org.uberfire</groupId>
+	      <artifactId>uberfire-workbench-client</artifactId>
+	    </dependency>
+
+	    <!-- this is actually something uberfire-workbench-client depends on without declaring it -->
+	    <dependency>
+	      <groupId>org.uberfire</groupId>
+	      <artifactId>uberfire-security-api</artifactId>
+	    </dependency>
+
+	    <!-- uberfire-workbench-client depends on this for its ApplicationReadyEvent. Should be an optional dep. -->
+	    <dependency>
+	      <groupId>org.uberfire</groupId>
+	      <artifactId>uberfire-js</artifactId>
+	    </dependency>
+
+	    <dependency>
+	      <groupId>org.slf4j</groupId>
+	      <artifactId>slf4j-log4j12</artifactId>
+	    </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -226,6 +259,26 @@
                                 <gwt.console.dev.host>${gwt.bindAddress}</gwt.console.dev.host>
                                 <gwt.console.dev.port>${gwt.bindPort}</gwt.console.dev.port>
                             </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>process-uberfire</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <outputDiagnostics>false</outputDiagnostics>
+                            <addCompileSourceRoots>false</addCompileSourceRoots>
+                            <appendSourceArtifacts>false</appendSourceArtifacts>
+                            <processors>
+                                <processor>org.uberfire.annotations.processors.WorkbenchSplashScreenProcessor</processor>
+                                <processor>org.uberfire.annotations.processors.WorkbenchContextProcessor</processor>
+                                <processor>org.uberfire.annotations.processors.WorkbenchScreenProcessor</processor>
+                                <processor>org.uberfire.annotations.processors.WorkbenchEditorProcessor</processor>
+                                <processor>org.uberfire.annotations.processors.WorkbenchPopupProcessor</processor>
+                                <processor>org.uberfire.annotations.processors.PerspectiveProcessor</processor>
+                            </processors>
                         </configuration>
                     </execution>
                 </executions>

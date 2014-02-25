@@ -42,8 +42,7 @@ import org.jboss.ballroom.client.widgets.forms.ResolveExpressionEvent;
  * @date 2/4/11
  */
 public class MainLayoutPresenter
-        extends Presenter<MainLayoutPresenter.MainLayoutView,
-        MainLayoutPresenter.MainLayoutProxy>
+        extends Presenter<MainLayoutPresenter.MainLayoutView, MainLayoutPresenter.MainLayoutProxy>
         implements ResolveExpressionEvent.ExpressionResolveListener, LogoutEvent.LogoutHandler {
 
     boolean revealDefault = true;
