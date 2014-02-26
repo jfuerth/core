@@ -35,15 +35,6 @@ import org.jboss.as.console.client.core.DefaultPlaceManager;
 @POC
 public class PlaceManagerPOC implements PlaceManager {
 
-    //@Inject
-    //private DefaultPlaceManager delegate;
-
-//    public PlaceManagerPOC() {
-//        System.out.println("*****************");
-//        System.out.println("PlaceManager delegate=" + delegate.getClass().getName());
-//        System.out.println("*****************");
-//    }
-
     @Override
     public void fireEvent(GwtEvent<?> event) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

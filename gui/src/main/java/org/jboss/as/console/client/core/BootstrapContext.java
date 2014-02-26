@@ -58,9 +58,6 @@ public class BootstrapContext implements ApplicationProperties {
     @Inject
     public BootstrapContext(@POC ProductConfig productConfig) {
 
-        System.out.println("********************");
-        System.out.println("BootstrapContext: ProductConfig impl=" + productConfig.getClass().getName());
-        System.out.println("********************");
         // Default values
         this.productName = "Management Console";
         this.productVersion = "";

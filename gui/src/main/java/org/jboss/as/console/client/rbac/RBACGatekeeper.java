@@ -29,9 +29,6 @@ public class RBACGatekeeper implements Gatekeeper {
         this.accessControlMetaData = accessControlMetaData;
         this.placemanager = placemanager;
         this.securityFramework = securityManager;
-        System.out.println("**************");
-        System.out.println("RBACGatekeeper: PlaceManager impl=" + placemanager.getClass().getName());
-        System.out.println("**************");
     }
 
     @Override

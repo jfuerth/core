@@ -19,7 +19,7 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
  * perspectives can manage their own views in the split panels, and all child
  * GWTP components can be converted to UberFire WorkbenchScreens or
  * WorkbenchEditors. This work can be done in batches, one perspective at a time.
- * 
+ *
  * @author jfuerth
  */
 @WorkbenchPerspective(identifier = "Profile", isDefault = true)
@@ -32,8 +32,8 @@ public class ProfilePerspective {
         p.setName(NameTokens.serverConfig);
 
         p.getRoot().addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest()));
+            new PartDefinitionImpl(
+                    new DefaultPlaceRequest("HelloWorldScreen")));
         return p;
     }
 

@@ -77,10 +77,6 @@ public class HostInfoStoreImpl implements HostInformationStore {
         serverAdapter = new EntityAdapter<Server>(Server.class, propertyMeta);
         jvmAdapter = new EntityAdapter<Jvm>(Jvm.class, propertyMeta);
         propertyAdapter = new EntityAdapter<PropertyRecord>(PropertyRecord.class, propertyMeta);
-        System.out.println("*****************");
-        System.out.println("HostInfoStoreImpl: BeanFactory impl=" + factory.getClass().getName());
-        System.out.println("HostInfoStoreImpl: ApplicationMetaData impl=" + propertyMeta.getClass().getName());
-        System.out.println("*****************");
     }
 
     @Override
