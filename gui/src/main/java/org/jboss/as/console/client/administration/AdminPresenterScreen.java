@@ -16,13 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.jboss.as.console.client.standalone;
+package org.jboss.as.console.client.administration;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.administration.AdministrationPresenter;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;

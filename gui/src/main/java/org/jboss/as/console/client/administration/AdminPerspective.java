@@ -1,6 +1,7 @@
-package org.jboss.as.console.client.standalone;
+package org.jboss.as.console.client.administration;
 
 import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.standalone.ServerMgmtApplicationPresenter;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.WorkbenchPerspective;
 import org.uberfire.lifecycle.OnClose;
