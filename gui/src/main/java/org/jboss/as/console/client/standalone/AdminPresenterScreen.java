@@ -18,21 +18,20 @@
  */
 package org.jboss.as.console.client.standalone;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.administration.AdministrationPresenter;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.lifecycle.OnClose;
+import org.uberfire.lifecycle.OnOpen;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import javax.annotation.PostConstruct;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.administration.AdministrationPresenter;
-import org.jboss.as.console.client.core.SuspendableView;
-import org.jboss.as.console.client.core.SuspendableViewImpl;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 @Dependent
 @WorkbenchScreen(identifier = "AdminPresenterScreen")
@@ -42,17 +41,18 @@ public class AdminPresenterScreen {
 
     @PostConstruct
     public void initGWTPPresenter() {
-        Console.MODULES.getAdministrationPresenter().get(new AsyncCallback<AdministrationPresenter>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                throw new RuntimeException(caught);
-            }
+        Console.MODULES.getAdministrationPresenter().get(
+                new AsyncCallback<AdministrationPresenter>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        throw new RuntimeException(caught);
+                    }
 
-            @Override
-            public void onSuccess(AdministrationPresenter result) {
-                gwtpPresenter = result;
-            }
-        });
+                    @Override
+                    public void onSuccess(AdministrationPresenter result) {
+                        gwtpPresenter = result;
+                    }
+                });
     }
 
     @WorkbenchPartTitle
@@ -62,9 +62,23 @@ public class AdminPresenterScreen {
 
     @WorkbenchPartView
     public IsWidget getView() {
-        System.out.println(">>>> gwtpPresenter=" + gwtpPresenter);
-        System.out.println(">>>> presenter=" + gwtpPresenter.getView());
         return gwtpPresenter;
-        //return new Label("I got added to the DOM");
     }
+
+    @OnOpen
+    public void onOpen() {
+        if (!gwtpPresenter.isVisible()) {
+            forceInternalReveal(gwtpPresenter);
+        }
+    }
+
+    @OnClose
+    public void HELLO() {
+        System.out.println(">>>> onClose()");
+    }
+
+    private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
+        presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
+    }-*/;
+
 }

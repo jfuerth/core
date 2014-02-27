@@ -3,6 +3,8 @@ package org.jboss.as.console.client.standalone;
 import org.jboss.as.console.client.core.NameTokens;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.WorkbenchPerspective;
+import org.uberfire.lifecycle.OnClose;
+import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
@@ -27,13 +29,14 @@ public class AdminPerspective {
 
     @Perspective
     public PerspectiveDefinition getPerspectiveDefinition() {
-        final PerspectiveDefinition p = new PerspectiveDefinitionImpl(PanelType.ROOT_LIST); // TODO use ROOT_SIMPLE instead?
+        final PerspectiveDefinition p = new PerspectiveDefinitionImpl(
+                PanelType.ROOT_STATIC);
         p.setTransient(true);
         p.setName(NameTokens.serverConfig);
 
         p.getRoot().addPart(
-            new PartDefinitionImpl(
-                    new DefaultPlaceRequest("AdminPresenterScreen")));
+                new PartDefinitionImpl(new DefaultPlaceRequest(
+                        "AdminPresenterScreen")));
         return p;
     }
 
