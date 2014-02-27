@@ -29,8 +29,11 @@ import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnOpen;
 
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 @Dependent
@@ -67,6 +70,15 @@ public class AdminPresenterScreen {
 
     @OnOpen
     public void onOpen() {
+        
+        // workaround: we need to remove the relative positioning from this
+        // element and its parent (which is a private internal element of
+        // ScrollPanel). Fortunately this is just temporary while we're
+        // incrementally switching over to UberFire + Errai
+        Element presenterElement = gwtpPresenter.asWidget().getElement();
+        presenterElement.getStyle().clearPosition();
+        presenterElement.getParentElement().getStyle().clearPosition();
+        
         if (!gwtpPresenter.isVisible()) {
             forceInternalReveal(gwtpPresenter);
         }
