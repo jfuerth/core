@@ -17,44 +17,38 @@
  * MA  02110-1301, USA.
  */
 
-package org.jboss.as.console.client.standalone;
+package org.jboss.as.console.client.standalone.runtime;
 
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
+import org.jboss.as.console.client.Console;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnOpen;
 
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-import javax.annotation.PostConstruct;
-
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.domain.profiles.ProfileMgmtPresenter;
-
 @Dependent
-@WorkbenchScreen(identifier = "ProfilePresenterScreen")
-public class ProfilePresenterScreen {
+@WorkbenchScreen(identifier = "StandaloneRuntimePresenterScreen")
+public class StandaloneRuntimePresenterScreen {
 
-  private static ProfileMgmtPresenter gwtpPresenter;
+  private static StandaloneRuntimePresenter gwtpPresenter;
 
   @PostConstruct
   public void initGWTPPresenter() {
-      Console.MODULES.getProfileMgmtPresenter().get(new AsyncCallback<ProfileMgmtPresenter>() {
+      Console.MODULES.getRuntimePresenter().get(new AsyncCallback<StandaloneRuntimePresenter>() {
           @Override
           public void onFailure(Throwable caught) {
               throw new RuntimeException(caught);
           }
 
           @Override
-          public void onSuccess(ProfileMgmtPresenter result) {
+          public void onSuccess(StandaloneRuntimePresenter result) {
               gwtpPresenter = result;
           }
       });
@@ -62,7 +56,7 @@ public class ProfilePresenterScreen {
 
   @WorkbenchPartTitle
   public String getTitle() {
-    return Console.CONSTANTS.common_label_profile();
+    return Console.CONSTANTS.common_label_runtimeName();
   }
 
   @WorkbenchPartView

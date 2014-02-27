@@ -27,7 +27,7 @@ public class ProfilePerspective {
 
     @Perspective
     public PerspectiveDefinition getPerspectiveDefinition() {
-        final PerspectiveDefinition p = new PerspectiveDefinitionImpl(PanelType.ROOT_LIST); // TODO use ROOT_SIMPLE instead?
+        final PerspectiveDefinition p = new PerspectiveDefinitionImpl(PanelType.ROOT_STATIC);
         p.setTransient(true);
         p.setName(NameTokens.serverConfig);
 

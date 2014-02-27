@@ -1,11 +1,8 @@
-package org.jboss.as.console.client.administration;
+package org.jboss.as.console.client.standalone.runtime;
 
 import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.standalone.ServerMgmtApplicationPresenter;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.lifecycle.OnClose;
-import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
@@ -14,8 +11,8 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
 
 /**
  * An UberFire perspective that houses the
- * {@link ServerMgmtApplicationPresenter}, which is the GWTP component providing
- * the "Profile" UI in the console.
+ * {@link StandaloneRuntimePresenter}, which is the GWTP component providing
+ * the "Runtime" UI in the console.
  * <p>
  * Future plans: once all GWTP components that take up the
  * MainLayoutPresenter.TYPE_MainContent slot have been converted, these UberFire
@@ -25,8 +22,8 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
  *
  * @author jfuerth
  */
-@WorkbenchPerspective(identifier = "Admin", isDefault = true)
-public class AdminPerspective {
+@WorkbenchPerspective(identifier = "StandaloneRuntime", isDefault = true)
+public class StandaloneRuntimePerspective {
 
     @Perspective
     public PerspectiveDefinition getPerspectiveDefinition() {
@@ -34,7 +31,9 @@ public class AdminPerspective {
         p.setTransient(true);
         p.setName(NameTokens.serverConfig);
 
-        p.getRoot().addPart(new PartDefinitionImpl(new DefaultPlaceRequest("AdminPresenterScreen")));
+        p.getRoot().addPart(
+            new PartDefinitionImpl(
+                    new DefaultPlaceRequest("StandaloneRuntimePresenterScreen")));
         return p;
     }
 

@@ -107,7 +107,7 @@ public class ServerMgmtApplicationPresenter extends
     protected void revealInParent() {
         //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
+        ufPlaceManager.goTo("Profile");
     }
 
     private PlaceRequest preferredPlace() {
