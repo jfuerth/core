@@ -47,10 +47,6 @@ public class DomainEntityManager implements
         this.eventBus = Console.getEventBus();
         this.factory = factory;
 
-        System.out.println("******************");
-        System.out.println("DomainEntityManager: BeanFactory impl=" + factory.getClass().getName());
-        System.out.println("******************");
-
         eventBus.addHandler(GlobalHostSelection.TYPE, this);
         eventBus.addHandler(GlobalServerSelection.TYPE, this);
         eventBus.addHandler(StaleGlobalModel.TYPE, this);

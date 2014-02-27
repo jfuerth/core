@@ -41,6 +41,7 @@ import org.jboss.as.console.client.shared.state.HostSelectionChanged;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
 import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
+import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.gwt.flow.client.Async;
 import org.jboss.gwt.flow.client.Control;
 import org.jboss.gwt.flow.client.Function;
@@ -131,7 +132,9 @@ public class DomainRuntimePresenter
 
     @Override
     protected void revealInParent() {
-        RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
+        ufPlaceManager.goTo("Admin");
     }
 
     @Override

@@ -22,8 +22,8 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
  *
  * @author jfuerth
  */
-@WorkbenchPerspective(identifier = "Profile", isDefault = true)
-public class ProfilePerspective {
+@WorkbenchPerspective(identifier = "Admin", isDefault = true)
+public class AdminPerspective {
 
     @Perspective
     public PerspectiveDefinition getPerspectiveDefinition() {
@@ -33,7 +33,7 @@ public class ProfilePerspective {
 
         p.getRoot().addPart(
             new PartDefinitionImpl(
-                    new DefaultPlaceRequest("ProfilePresenterScreen")));
+                    new DefaultPlaceRequest("AdminPresenterScreen")));
         return p;
     }
 

@@ -19,6 +19,7 @@
 package org.jboss.as.console.client.administration;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,9 +37,11 @@ public class AdministrationView extends SuspendableViewImpl implements Administr
     private AdministrationPresenter presenter;
 
     public AdministrationView() {
-
+System.out.println("!!! AdministrationView.ctor");
+        System.out.println("AdministrationView ctor id=" + this);
         contentCanvas = new LayoutPanel();
         contentCanvas.getElement().setAttribute("role", "main");
+        contentCanvas.add(new Label("I got added"));
 
         lhsNavigation = new LHSAdministrationNavigation();
         Widget navigationWidget = lhsNavigation.asWidget();
@@ -56,6 +59,7 @@ public class AdministrationView extends SuspendableViewImpl implements Administr
 
     @Override
     public Widget createWidget() {
+        System.out.println("!!! AdministrationView.createWidget()");
         return layout;
     }
 

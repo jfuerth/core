@@ -49,6 +49,7 @@ import org.jboss.as.console.client.shared.SubsystemMetaData;
 import org.jboss.as.console.client.shared.model.SubsystemRecord;
 import org.jboss.as.console.client.shared.model.SubsystemStore;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
+import org.jboss.errai.ioc.client.container.IOC;
 
 /**
  * @author Heiko Braun
@@ -148,7 +149,9 @@ public class ProfileMgmtPresenter
     @Override
     protected void revealInParent() {
         // reveal in main layout
-        RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
+        ufPlaceManager.goTo("Admin");
     }
 
     @Override

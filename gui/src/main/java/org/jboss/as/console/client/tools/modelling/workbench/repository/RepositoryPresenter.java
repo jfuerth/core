@@ -50,6 +50,7 @@ import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.useware.kernel.model.Dialog;
 
 import java.util.List;
+import org.jboss.errai.ioc.client.container.IOC;
 
 /**
  * Lists the available interaction units and let the user create new interaction units.
@@ -243,7 +244,9 @@ public class RepositoryPresenter
 
     @Override
     protected void revealInParent() {
-        RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
+        ufPlaceManager.goTo("Admin");
     }
 
     public void loadDir(final Entry dir, boolean clearHistory) {

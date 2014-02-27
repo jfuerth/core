@@ -37,6 +37,7 @@ import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
+import org.jboss.errai.ioc.client.container.IOC;
 
 /**
  * @author Harald Pehl
@@ -78,6 +79,8 @@ public class AdministrationPresenter
 
     @Override
     protected void revealInParent() {
-        RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
+        ufPlaceManager.goTo("Admin");
+        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
     }
 }
