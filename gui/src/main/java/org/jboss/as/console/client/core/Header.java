@@ -97,6 +97,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
     @Inject
     public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, @POC BootstrapContext bootstrap,
                   @POC PlaceManager placeManager) {
+        new Exception("*** New Header@" + System.identityHashCode(this)).printStackTrace();
         this.messageBar = new MessageBar(messageCenter);
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;
@@ -413,6 +414,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
     {
         toggleSubnavigation(name);
 
+        System.out.println("Header@" + System.identityHashCode(this) +".linksPane is " + linksPane);
         com.google.gwt.user.client.Element target = linksPane.getElementById("header-links-ref");
         if(target!=null) // standalone doesn't provide any top level links
         {
