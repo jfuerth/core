@@ -229,6 +229,9 @@
             <resource>
                 <directory>${project.build.directory}/generated-sources/apt</directory>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
         </resources>
 
 
