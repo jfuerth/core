@@ -23,22 +23,9 @@ package org.jboss.as.console.client;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.DelayedBindRegistry;
-import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+
 import org.jboss.as.console.client.core.AsyncCallHandler;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.LoadingPanel;
@@ -60,7 +47,7 @@ import org.jboss.as.console.client.core.message.Message;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
-import org.jboss.as.console.client.poc.ProductConfigPOC;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.Preferences;
 import org.jboss.as.console.client.shared.help.HelpSystem;
 import org.jboss.as.console.client.shared.state.ReloadNotification;
@@ -72,18 +59,37 @@ import org.jboss.dmr.client.notify.Notifications;
 import org.jboss.gwt.flow.client.Async;
 import org.jboss.gwt.flow.client.Outcome;
 
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.DelayedBindRegistry;
+import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+
 /**
  * Main application entry point. Executes several initialisation phases.
  *
  * @author Heiko Braun
  */
+@ApplicationScoped
 public class Console implements EntryPoint, ReloadNotification.Handler {
 
     public final static Composite MODULES = GWT.create(Composite.class);
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
-    public final static ProductConfig prodConfig = new ProductConfigPOC(); //GWT.create(ProductConfig.class);
+    
+    @Produces @POC
+    public final ProductConfig prodConfig = GWT.create(ProductConfig.class);
 
     public void onModuleLoad() {
         Log.setUncaughtExceptionHandler();
@@ -266,10 +272,21 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
         return MODULES.getMessageCenter();
     }
 
+    @Produces @POC
+    private PlaceManager getPlaceManager2() {
+        return MODULES.getPlaceManager();
+    }
+
     public static PlaceManager getPlaceManager() {
         return MODULES.getPlaceManager();
     }
 
+    @Produces @POC
+    public BootstrapContext getBootstrapContext2()
+    {
+        return MODULES.getBootstrapContext();
+    }
+    
     public static BootstrapContext getBootstrapContext()
     {
         return MODULES.getBootstrapContext();

@@ -10,14 +10,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.plugins.AccessControlRegistry;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.mbui.behaviour.CoreGUIContext;
 import org.jboss.as.console.mbui.model.mapping.AddressMapping;
 import org.jboss.ballroom.client.rbac.SecurityContext;
@@ -37,6 +40,7 @@ import org.useware.kernel.gui.behaviour.FilteringStatementContext;
  * @author Heiko Braun
  * @date 7/3/13
  */
+@ApplicationScoped
 public class SecurityFrameworkImpl implements SecurityFramework {
 
 
@@ -65,7 +69,7 @@ public class SecurityFrameworkImpl implements SecurityFramework {
     public SecurityFrameworkImpl(
             AccessControlRegistry accessControlMetaData,
             DispatchAsync dispatcher,
-            CoreGUIContext statementContext, final BootstrapContext bootstrap) {
+            CoreGUIContext statementContext, final @POC BootstrapContext bootstrap) {
         this.accessControlMetaData = accessControlMetaData;
         this.dispatcher = dispatcher;
         this.statementContext = statementContext;

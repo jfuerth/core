@@ -21,6 +21,18 @@ package org.jboss.as.console.client.core;
 
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.ProductConfig;
+import org.jboss.as.console.client.core.message.MessageBar;
+import org.jboss.as.console.client.core.message.MessageCenter;
+import org.jboss.as.console.client.core.message.MessageCenterView;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.rbac.RBACContextView;
+import org.jboss.as.console.client.widgets.popups.DefaultPopup;
+import org.jboss.ballroom.client.widgets.window.Feedback;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
@@ -45,14 +57,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.ProductConfig;
-import org.jboss.as.console.client.core.message.MessageBar;
-import org.jboss.as.console.client.core.message.MessageCenter;
-import org.jboss.as.console.client.core.message.MessageCenterView;
-import org.jboss.as.console.client.rbac.RBACContextView;
-import org.jboss.as.console.client.widgets.popups.DefaultPopup;
-import org.jboss.ballroom.client.widgets.window.Feedback;
 
 /**
  * Top level header, gives access to main applications.
@@ -60,7 +64,8 @@ import org.jboss.ballroom.client.widgets.window.Feedback;
  * @author Heiko Braun
  * @date 1/28/11
  */
-public class Header implements ValueChangeHandler<String> {
+@ApplicationScoped
+public class Header implements ValueChangeHandler<String>, org.uberfire.client.workbench.Header {
 
     private HTMLPanel linksPane;
     private String currentHighlightedSection = null;
@@ -90,8 +95,8 @@ public class Header implements ValueChangeHandler<String> {
     private PlaceManager placeManager;
 
     @Inject
-    public Header(MessageCenter messageCenter, ProductConfig productConfig, BootstrapContext bootstrap,
-                  PlaceManager placeManager) {
+    public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, @POC BootstrapContext bootstrap,
+                  @POC PlaceManager placeManager) {
         this.messageBar = new MessageBar(messageCenter);
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;
@@ -443,5 +448,10 @@ public class Header implements ValueChangeHandler<String> {
         // TODO: fill in contents
 
         return subnavigation;
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }

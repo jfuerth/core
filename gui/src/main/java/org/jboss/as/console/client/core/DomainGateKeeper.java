@@ -1,9 +1,11 @@
 package org.jboss.as.console.client.core;
 
-import com.gwtplatform.mvp.client.proxy.Gatekeeper;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.jboss.as.console.client.poc.POC;
+
+import com.gwtplatform.mvp.client.proxy.Gatekeeper;
 
 /**
  * @author Heiko Braun
@@ -16,7 +18,7 @@ public class DomainGateKeeper implements Gatekeeper {
     private final BootstrapContext bootstrapContext;
 
     @Inject
-    public DomainGateKeeper(final BootstrapContext bootstrapContext) {
+    public DomainGateKeeper(final @POC BootstrapContext bootstrapContext) {
         this.bootstrapContext = bootstrapContext;
     }
 

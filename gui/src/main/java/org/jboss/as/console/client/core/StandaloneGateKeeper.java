@@ -5,6 +5,8 @@ import com.gwtplatform.mvp.client.proxy.Gatekeeper;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.jboss.as.console.client.poc.POC;
+
 /**
  * @author Heiko Braun
  * @date 1/26/12
@@ -16,7 +18,7 @@ public class StandaloneGateKeeper implements Gatekeeper {
     private final BootstrapContext bootstrapContext;
 
     @Inject
-    public StandaloneGateKeeper(final BootstrapContext bootstrapContext) {
+    public StandaloneGateKeeper(final @POC BootstrapContext bootstrapContext) {
         this.bootstrapContext = bootstrapContext;
     }
 

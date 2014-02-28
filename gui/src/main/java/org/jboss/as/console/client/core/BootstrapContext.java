@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+
 import org.jboss.as.console.client.ProductConfig;
 import org.jboss.as.console.client.domain.model.ProfileRecord;
 import org.jboss.as.console.client.poc.POC;
@@ -39,6 +41,7 @@ import org.jboss.as.console.client.rbac.StandardRole;
  * @author Heiko Braun
  * @date 2/11/11
  */
+@ApplicationScoped
 public class BootstrapContext implements ApplicationProperties {
 
     private Map<String,String> ctx = new HashMap<String,String>();
