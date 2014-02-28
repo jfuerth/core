@@ -283,6 +283,9 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
 
         outerLayout.getElement().setAttribute("role", "navigation");
         outerLayout.getElement().setAttribute("aria-label", "Toplevel Categories");
+        outerLayout.getElement().getStyle().clearPosition();
+        outerLayout.getElement().getStyle().setPaddingBottom(25, Style.Unit.PX);
+        
         return outerLayout;
     }
 
@@ -339,9 +342,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
             widget.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                    placeManager.revealPlace(
-                            new PlaceRequest.Builder().nameToken(token).build(), false
-                    );
+                    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(token).build(), false);
                 }
             });
             linksPane.add(widget, id);
