@@ -74,6 +74,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import org.uberfire.client.workbench.Workbench;
 
 /**
  * Main application entry point. Executes several initialisation phases.
@@ -87,11 +90,26 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
-    
+
     @Produces @POC
     public final ProductConfig prodConfig = GWT.create(ProductConfig.class);
 
+    @Inject
+    private Workbench workbench;
+
+    public Console() {
+        new Exception("*** New Console@" + System.identityHashCode(this)).printStackTrace();
+    }
+
+    @PostConstruct
+    public void blockWorkbenchStartup() {
+        workbench.addStartupBlocker(Console.class);
+        onModuleLoad();
+    }
+
     public void onModuleLoad() {
+        new Exception("*** onModuleLoad()@" + System.identityHashCode(this)).printStackTrace();
+        if (workbench == null) return;
         Log.setUncaughtExceptionHandler();
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
             @Override
@@ -194,7 +212,7 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
                         // Activate once CORS is supported / Keymaker is in place
                         // new BootstrapServerSetup(),
                         new LoadGoogleViz(),
-                        new ExecutionMode(MODULES.getDispatchAsync()),
+                        new ExecutionMode(MODULES.getDispatchAsync(), workbench),
                         new TrackExecutionMode(MODULES.getAnalytics()),
                         new LoadCompatMatrix(MODULES.modelVersions()),
                         new RegisterSubsystems(MODULES.getSubsystemRegistry()),
@@ -286,7 +304,7 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
     {
         return MODULES.getBootstrapContext();
     }
-    
+
     public static BootstrapContext getBootstrapContext()
     {
         return MODULES.getBootstrapContext();

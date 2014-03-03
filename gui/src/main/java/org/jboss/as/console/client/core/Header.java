@@ -97,7 +97,6 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
     @Inject
     public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, @POC BootstrapContext bootstrap,
                   @POC PlaceManager placeManager) {
-        new Exception("*** New Header@" + System.identityHashCode(this)).printStackTrace();
         this.messageBar = new MessageBar(messageCenter);
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;
@@ -286,7 +285,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         outerLayout.getElement().setAttribute("aria-label", "Toplevel Categories");
         outerLayout.getElement().getStyle().clearPosition();
         outerLayout.getElement().getStyle().setPaddingBottom(25, Style.Unit.PX);
-        
+
         return outerLayout;
     }
 

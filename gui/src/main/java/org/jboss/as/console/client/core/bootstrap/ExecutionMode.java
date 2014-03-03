@@ -28,8 +28,8 @@ import java.util.Set;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.rbac.StandardRole;
 import org.jboss.as.console.client.shared.Preferences;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
@@ -37,6 +37,7 @@ import org.jboss.dmr.client.dispatch.impl.DMRAction;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 import org.jboss.gwt.flow.client.Control;
 import org.jboss.gwt.flow.client.Function;
+import org.uberfire.client.workbench.Workbench;
 
 /**
  * @author Heiko Braun
@@ -45,9 +46,11 @@ import org.jboss.gwt.flow.client.Function;
 public class ExecutionMode implements Function<BootstrapContext> {
 
     private DispatchAsync dispatcher;
+    private Workbench workbench;
 
-    public ExecutionMode(DispatchAsync dispatcher) {
+    public ExecutionMode(DispatchAsync dispatcher, Workbench workbench) {
         this.dispatcher = dispatcher;
+        this.workbench = workbench;
     }
 
     @Override
@@ -172,6 +175,8 @@ public class ExecutionMode implements Function<BootstrapContext> {
                     Preferences.clear(Preferences.Key.RUN_AS_ROLE);
 
                     control.proceed();
+
+                    workbench.removeStartupBlocker(Console.class);
                 }
             }
         });

@@ -124,12 +124,15 @@ public class BootstrapContext implements ApplicationProperties {
     @Override
     public void setProperty(String key, String value)
     {
+        //System.out.println("BootstrapContext" + System.identityHashCode(this) + ".setProperty " + key + "=" + value);
         ctx.put(key, value);
     }
 
     @Override
     public String getProperty(String key)
     {
+        //System.out.println("BootstrapContext" + System.identityHashCode(this) + ".getProperty " + key);
+        //System.out.println("BootstrapContext" + System.identityHashCode(this) + ".ctx.get(" + key +")=" + ctx.get(key));
         return ctx.get(key);
     }
 
