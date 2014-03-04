@@ -16,6 +16,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import java.util.Collections;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.NameTokens;
@@ -26,6 +27,7 @@ import org.jboss.as.console.client.shared.model.SubsystemRecord;
 import org.jboss.as.console.client.shared.model.SubsystemStore;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -83,8 +85,8 @@ public class StandaloneRuntimePresenter
 
     @Override
     protected void revealInParent() {
-        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("StandaloneRuntime");
+        //ufPlaceManager.goTo("StandaloneRuntime");
+        ufPlaceManager.goTo(new DefaultPlaceRequest("StandaloneRuntime", Collections.EMPTY_MAP, false));
     }
 }

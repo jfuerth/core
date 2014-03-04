@@ -36,6 +36,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import java.util.Collections;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.NameTokens;
@@ -50,6 +51,7 @@ import org.jboss.as.console.client.shared.model.SubsystemRecord;
 import org.jboss.as.console.client.shared.model.SubsystemStore;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -149,9 +151,9 @@ public class ProfileMgmtPresenter
     @Override
     protected void revealInParent() {
         // reveal in main layout
-        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
+        //ufPlaceManager.goTo("Admin");
+        ufPlaceManager.goTo(new DefaultPlaceRequest("Admin", Collections.EMPTY_MAP, false));
     }
 
     @Override

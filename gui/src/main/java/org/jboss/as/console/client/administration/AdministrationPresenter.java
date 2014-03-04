@@ -32,12 +32,14 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import java.util.Collections;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Harald Pehl
@@ -80,7 +82,8 @@ public class AdministrationPresenter
     @Override
     protected void revealInParent() {
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
-        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
+        //ufPlaceManager.goTo("Admin");
+        System.out.println("AdministrationPresenter.revealInParent()");
+        ufPlaceManager.goTo(new DefaultPlaceRequest("Admin", Collections.EMPTY_MAP, false));
     }
 }

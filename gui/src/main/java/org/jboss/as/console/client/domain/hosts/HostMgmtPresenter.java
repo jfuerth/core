@@ -34,6 +34,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import java.util.Collections;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.Header;
@@ -47,6 +48,7 @@ import org.jboss.as.console.client.shared.state.HostList;
 import org.jboss.as.console.client.shared.state.PerspectivePresenter;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -123,6 +125,7 @@ public class HostMgmtPresenter extends PerspectivePresenter<HostMgmtPresenter.My
     protected void revealInParent() {
        // RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
        org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
+        //ufPlaceManager.goTo("Admin");
+       ufPlaceManager.goTo(new DefaultPlaceRequest("Admin", Collections.EMPTY_MAP, false));
     }
 }

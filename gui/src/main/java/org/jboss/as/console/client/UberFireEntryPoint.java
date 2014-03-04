@@ -32,5 +32,6 @@ public class UberFireEntryPoint {
     @PostConstruct
     private void earlyInit() {
         UberFirePreferences.setProperty("org.uberfire.client.workbench.widgets.listbar.context.disable", true);
+        UberFirePreferences.setProperty("org.uberfire.client.mvp.PlaceManagerImpl.ignoreUnkownPlaces", true);
     }
 }

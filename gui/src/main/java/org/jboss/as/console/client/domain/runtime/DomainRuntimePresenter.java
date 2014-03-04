@@ -47,6 +47,7 @@ import org.jboss.gwt.flow.client.Control;
 import org.jboss.gwt.flow.client.Function;
 import org.jboss.gwt.flow.client.Outcome;
 import org.jboss.gwt.flow.client.PushFlowCallback;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -132,9 +133,9 @@ public class DomainRuntimePresenter
 
     @Override
     protected void revealInParent() {
-        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
+        //ufPlaceManager.goTo("Admin");
+        ufPlaceManager.goTo(new DefaultPlaceRequest("Admin", Collections.EMPTY_MAP, false));
     }
 
     @Override

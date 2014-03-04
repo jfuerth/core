@@ -34,6 +34,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import java.util.Collections;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
@@ -51,6 +52,7 @@ import org.useware.kernel.model.Dialog;
 
 import java.util.List;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * Lists the available interaction units and let the user create new interaction units.
@@ -244,9 +246,9 @@ public class RepositoryPresenter
 
     @Override
     protected void revealInParent() {
-        //RevealContentEvent.fire(this, MainLayoutPresenter.TYPE_MainContent, this);
         org.uberfire.client.mvp.PlaceManager ufPlaceManager = IOC.getBeanManager().lookupBean(org.uberfire.client.mvp.PlaceManager.class).getInstance();
-        ufPlaceManager.goTo("Admin");
+        //ufPlaceManager.goTo("Admin");
+        ufPlaceManager.goTo(new DefaultPlaceRequest("Admin", Collections.EMPTY_MAP, false));
     }
 
     public void loadDir(final Entry dir, boolean clearHistory) {
