@@ -26,6 +26,7 @@ import org.jboss.as.console.client.Console;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnOpen;
 
 import com.google.gwt.user.client.Element;
@@ -83,4 +84,17 @@ public class StandaloneRuntimePresenterScreen {
   private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
       presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
   }-*/;
+  
+  @OnClose
+  public void onClose() {
+      System.out.println(">>>> StandaloneRuntimePresenterScreen.onClose()");
+      if (gwtpPresenter.isVisible()) {
+          forceInternalHide(gwtpPresenter);
+      }
+  }
+
+  private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
+      presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
+  }-*/;
+
 }

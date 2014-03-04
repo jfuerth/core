@@ -85,18 +85,17 @@ public class AdminPresenterScreen {
 
     @OnClose
     public void onClose() {
-        System.out.println(">>>> onClose()");
+        System.out.println(">>>> AdminPresenterScreen.onClose()");
         if (gwtpPresenter.isVisible()) {
             forceInternalHide(gwtpPresenter);
         }
     }
+    private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
+        presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
+    }-*/;
 
     private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
         presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
-    }-*/;
-
-    private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
-        presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
     }-*/;
 
 }
