@@ -38,12 +38,11 @@ import javax.annotation.PostConstruct;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.profiles.ProfileMgmtPresenter;
+import org.jboss.as.console.client.poc.BasePerspectivePresenterScreen;
 
 @Dependent
 @WorkbenchScreen(identifier = "ProfilePresenterScreen")
-public class ProfilePresenterScreen {
-
-  private static ProfileMgmtPresenter gwtpPresenter;
+public class ProfilePresenterScreen extends BasePerspectivePresenterScreen {
 
   @PostConstruct
   public void initGWTPPresenter() {
@@ -55,7 +54,7 @@ public class ProfilePresenterScreen {
 
           @Override
           public void onSuccess(ProfileMgmtPresenter result) {
-              gwtpPresenter = result;
+              setGwtpPresenter(result);
           }
       });
   }
@@ -64,41 +63,5 @@ public class ProfilePresenterScreen {
   public String getTitle() {
     return Console.CONSTANTS.common_label_profile();
   }
-
-  @WorkbenchPartView
-  public IsWidget getView() {
-      return gwtpPresenter;
-  }
-
-  @OnOpen
-  public void onOpen() {
-      
-      // workaround: we need to remove the relative positioning from this
-      // element and its parent (which is a private internal element of
-      // ScrollPanel). Fortunately this is just temporary while we're
-      // incrementally switching over to UberFire + Errai
-      Element presenterElement = gwtpPresenter.asWidget().getElement();
-      presenterElement.getStyle().clearPosition();
-      presenterElement.getParentElement().getStyle().clearPosition();
-      
-      if (!gwtpPresenter.isVisible()) {
-          forceInternalReveal(gwtpPresenter);
-      }
-  }
-
-  private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
-      presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
-  }-*/;
-  
-  @OnClose
-  public void onClose() {
-      System.out.println(">>>> ProfilePresenterScreen.onClose()");
-      if (gwtpPresenter.isVisible()) {
-          forceInternalHide(gwtpPresenter);
-      }
-  }
-  private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
-      presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
-  }-*/;
 
 }

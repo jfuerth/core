@@ -18,31 +18,20 @@
  */
 package org.jboss.as.console.client.administration;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.poc.BasePerspectivePresenterScreen;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.lifecycle.OnClose;
-import org.uberfire.lifecycle.OnOpen;
 
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 @Dependent
 @WorkbenchScreen(identifier = "AdminPresenterScreen")
-public class AdminPresenterScreen {
-
-    private static AdministrationPresenter gwtpPresenter;
-
-    @PostConstruct
-    public void initGWTPPresenter() {
+public class AdminPresenterScreen extends BasePerspectivePresenterScreen {
+    
+    public AdminPresenterScreen() {
         Console.MODULES.getAdministrationPresenter().get(
                 new AsyncCallback<AdministrationPresenter>() {
                     @Override
@@ -52,7 +41,7 @@ public class AdminPresenterScreen {
 
                     @Override
                     public void onSuccess(AdministrationPresenter result) {
-                        gwtpPresenter = result;
+                        setGwtpPresenter(result);
                     }
                 });
     }
@@ -61,41 +50,5 @@ public class AdminPresenterScreen {
     public String getTitle() {
         return "Administration";
     }
-
-    @WorkbenchPartView
-    public IsWidget getView() {
-        return gwtpPresenter;
-    }
-
-    @OnOpen
-    public void onOpen() {
-        
-        // workaround: we need to remove the relative positioning from this
-        // element and its parent (which is a private internal element of
-        // ScrollPanel). Fortunately this is just temporary while we're
-        // incrementally switching over to UberFire + Errai
-        Element presenterElement = gwtpPresenter.asWidget().getElement();
-        presenterElement.getStyle().clearPosition();
-        presenterElement.getParentElement().getStyle().clearPosition();
-        
-        if (!gwtpPresenter.isVisible()) {
-            forceInternalReveal(gwtpPresenter);
-        }
-    }
-
-    @OnClose
-    public void onClose() {
-        System.out.println(">>>> AdminPresenterScreen.onClose()");
-        if (gwtpPresenter.isVisible()) {
-            forceInternalHide(gwtpPresenter);
-        }
-    }
-    private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
-        presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
-    }-*/;
-
-    private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
-        presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
-    }-*/;
 
 }

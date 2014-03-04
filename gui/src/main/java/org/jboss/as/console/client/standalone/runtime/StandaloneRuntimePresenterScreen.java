@@ -19,29 +19,20 @@
 
 package org.jboss.as.console.client.standalone.runtime;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.poc.BasePerspectivePresenterScreen;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.lifecycle.OnClose;
-import org.uberfire.lifecycle.OnOpen;
 
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 @Dependent
 @WorkbenchScreen(identifier = "StandaloneRuntimePresenterScreen")
-public class StandaloneRuntimePresenterScreen {
+public class StandaloneRuntimePresenterScreen extends BasePerspectivePresenterScreen {
 
-  private static StandaloneRuntimePresenter gwtpPresenter;
-
-  @PostConstruct
-  public void initGWTPPresenter() {
+  public StandaloneRuntimePresenterScreen() {
       Console.MODULES.getRuntimePresenter().get(new AsyncCallback<StandaloneRuntimePresenter>() {
           @Override
           public void onFailure(Throwable caught) {
@@ -50,7 +41,7 @@ public class StandaloneRuntimePresenterScreen {
 
           @Override
           public void onSuccess(StandaloneRuntimePresenter result) {
-              gwtpPresenter = result;
+              setGwtpPresenter(result);
           }
       });
   }
@@ -59,42 +50,5 @@ public class StandaloneRuntimePresenterScreen {
   public String getTitle() {
     return Console.CONSTANTS.common_label_runtimeName();
   }
-
-  @WorkbenchPartView
-  public IsWidget getView() {
-      return gwtpPresenter;
-  }
-
-  @OnOpen
-  public void onOpen() {
-      
-      // workaround: we need to remove the relative positioning from this
-      // element and its parent (which is a private internal element of
-      // ScrollPanel). Fortunately this is just temporary while we're
-      // incrementally switching over to UberFire + Errai
-      Element presenterElement = gwtpPresenter.asWidget().getElement();
-      presenterElement.getStyle().clearPosition();
-      presenterElement.getParentElement().getStyle().clearPosition();
-      
-      if (!gwtpPresenter.isVisible()) {
-          forceInternalReveal(gwtpPresenter);
-      }
-  }
-
-  private static native void forceInternalReveal(PresenterWidget<?> presenter) /*-{
-      presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalReveal()();
-  }-*/;
-  
-  @OnClose
-  public void onClose() {
-      System.out.println(">>>> StandaloneRuntimePresenterScreen.onClose()");
-      if (gwtpPresenter.isVisible()) {
-          forceInternalHide(gwtpPresenter);
-      }
-  }
-
-  private static native void forceInternalHide(PresenterWidget<?> presenter) /*-{
-      presenter.@com.gwtplatform.mvp.client.PresenterWidget::internalHide()();
-  }-*/;
 
 }
