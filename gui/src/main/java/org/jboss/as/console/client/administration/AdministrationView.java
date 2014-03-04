@@ -37,11 +37,8 @@ public class AdministrationView extends SuspendableViewImpl implements Administr
     private AdministrationPresenter presenter;
 
     public AdministrationView() {
-System.out.println("!!! AdministrationView.ctor");
-        System.out.println("AdministrationView ctor id=" + this);
         contentCanvas = new LayoutPanel();
         contentCanvas.getElement().setAttribute("role", "main");
-        contentCanvas.add(new Label("I got added"));
 
         lhsNavigation = new LHSAdministrationNavigation();
         Widget navigationWidget = lhsNavigation.asWidget();
@@ -59,7 +56,6 @@ System.out.println("!!! AdministrationView.ctor");
 
     @Override
     public Widget createWidget() {
-        System.out.println("!!! AdministrationView.createWidget()");
         return layout;
     }
 
