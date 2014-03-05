@@ -19,26 +19,15 @@
 
 package org.jboss.as.console.client.standalone;
 
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
-import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartView;
-import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.lifecycle.OnClose;
-import org.uberfire.lifecycle.OnOpen;
-
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
-import com.gwtplatform.mvp.client.PresenterWidget;
-
-import javax.annotation.PostConstruct;
-
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.domain.profiles.ProfileMgmtPresenter;
 import org.jboss.as.console.client.poc.BasePerspectivePresenterScreen;
+import org.uberfire.client.annotations.WorkbenchPartTitle;
+import org.uberfire.client.annotations.WorkbenchScreen;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @Dependent
 @WorkbenchScreen(identifier = "ProfilePresenterScreen")
@@ -46,14 +35,14 @@ public class ProfilePresenterScreen extends BasePerspectivePresenterScreen {
 
   @PostConstruct
   public void initGWTPPresenter() {
-      Console.MODULES.getProfileMgmtPresenter().get(new AsyncCallback<ProfileMgmtPresenter>() {
+      Console.MODULES.getServerManagementAppPresenter().get(new AsyncCallback<ServerMgmtApplicationPresenter>() {
           @Override
           public void onFailure(Throwable caught) {
               throw new RuntimeException(caught);
           }
 
           @Override
-          public void onSuccess(ProfileMgmtPresenter result) {
+          public void onSuccess(ServerMgmtApplicationPresenter result) {
               setGwtpPresenter(result);
           }
       });
