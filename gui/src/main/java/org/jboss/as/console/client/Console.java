@@ -23,8 +23,9 @@ package org.jboss.as.console.client;
 import java.util.EnumSet;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
 import org.jboss.as.console.client.core.AsyncCallHandler;
 import org.jboss.as.console.client.core.BootstrapContext;
@@ -56,11 +57,12 @@ import org.jboss.as.console.client.shared.state.ServerState;
 import org.jboss.as.console.client.widgets.progress.ProgressPolyfill;
 import org.jboss.dmr.client.dispatch.DispatchError;
 import org.jboss.dmr.client.notify.Notifications;
+import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.jboss.gwt.flow.client.Async;
 import org.jboss.gwt.flow.client.Outcome;
+import org.uberfire.client.workbench.Workbench;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
@@ -74,17 +76,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import org.uberfire.client.workbench.Workbench;
 
 /**
  * Main application entry point. Executes several initialisation phases.
  *
  * @author Heiko Braun
  */
-@ApplicationScoped
-public class Console implements EntryPoint, ReloadNotification.Handler {
+@EntryPoint
+public class Console implements ReloadNotification.Handler {
 
     public final static Composite MODULES = GWT.create(Composite.class);
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
@@ -97,18 +96,9 @@ public class Console implements EntryPoint, ReloadNotification.Handler {
     @Inject
     private Workbench workbench;
 
-    public Console() {
-        new Exception("*** New Console@" + System.identityHashCode(this)).printStackTrace();
-    }
-
     @PostConstruct
     public void blockWorkbenchStartup() {
         workbench.addStartupBlocker(Console.class);
-        onModuleLoad();
-    }
-
-    public void onModuleLoad() {
-        new Exception("*** onModuleLoad()@" + System.identityHashCode(this)).printStackTrace();
         if (workbench == null) return;
         Log.setUncaughtExceptionHandler();
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {

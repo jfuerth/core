@@ -23,9 +23,11 @@ import javax.enterprise.context.Dependent;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.poc.BasePerspectivePresenterScreen;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
+import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 @Dependent
 @WorkbenchScreen(identifier = "AdminPresenterScreen")
@@ -50,5 +52,5 @@ public class AdminPresenterScreen extends BasePerspectivePresenterScreen {
     public String getTitle() {
         return "Administration";
     }
-
+    
 }
