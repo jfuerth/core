@@ -29,7 +29,6 @@ import javax.inject.Inject;
 
 import org.jboss.as.console.client.core.AsyncCallHandler;
 import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.LoadingPanel;
 import org.jboss.as.console.client.core.UIConstants;
 import org.jboss.as.console.client.core.UIDebugConstants;
 import org.jboss.as.console.client.core.UIMessages;
@@ -73,7 +72,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
@@ -141,10 +140,6 @@ public class Console implements ReloadNotification.Handler {
         // Inject progress polyfill js code
         ProgressPolyfill.inject();
 
-        // display the loading panel
-        final Widget loadingPanel = new LoadingPanel().asWidget();
-        RootLayoutPanel.get().add(loadingPanel);
-
         GWT.runAsync(new RunAsyncCallback() {
             @Override
             public void onFailure(Throwable caught) {
@@ -167,7 +162,7 @@ public class Console implements ReloadNotification.Handler {
                     @Override
                     public void onFailure(BootstrapContext context) {
 
-                        RootLayoutPanel.get().remove(loadingPanel);
+                        hideLoadingPanel();
 
                         String cause = "";
                         int status = 500;
@@ -195,7 +190,7 @@ public class Console implements ReloadNotification.Handler {
 
                     @Override
                     public void onSuccess(BootstrapContext context) {
-                        RootLayoutPanel.get().remove(loadingPanel);
+                        hideLoadingPanel();
 
                         // DMR notifications
                         Notifications.addReloadHandler(Console.this);
@@ -234,7 +229,7 @@ public class Console implements ReloadNotification.Handler {
     private static void hideLoadingPanel() {
         RootPanel.get("loading-panel").removeFromParent();
     }
-
+    
     public static void info(String message) {
         getMessageCenter().notify(
                 new Message(message, Message.Severity.Info)
