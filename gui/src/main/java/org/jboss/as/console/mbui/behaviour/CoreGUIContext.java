@@ -1,13 +1,15 @@
 package org.jboss.as.console.mbui.behaviour;
 
+import java.util.LinkedList;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.auth.CurrentUser;
 import org.jboss.as.console.client.domain.profiles.CurrentProfileSelection;
 import org.jboss.as.console.client.shared.state.DomainEntityManager;
 import org.useware.kernel.gui.behaviour.StatementContext;
-
-import javax.inject.Inject;
-import java.util.LinkedList;
 
 /**
  * A default context for statements that reside with the core framework.<br/>
@@ -17,6 +19,7 @@ import java.util.LinkedList;
  * @author Heiko Braun
  * @date 2/6/13
  */
+@ApplicationScoped
 public class CoreGUIContext implements StatementContext {
 
     public final static String USER = "global.user";
@@ -25,9 +28,9 @@ public class CoreGUIContext implements StatementContext {
     public final static String SELECTED_SERVER = "selected.server";
     private final DomainEntityManager domainEntities;
 
-    private CurrentProfileSelection profileSelection;
-    private CurrentUser userSelection;
-    private StatementContext delegate = null;
+    private final CurrentProfileSelection profileSelection;
+    private final CurrentUser userSelection;
+    private final StatementContext delegate = null;
 
     @Inject
     public CoreGUIContext(CurrentProfileSelection profileSelection, CurrentUser userSelection, DomainEntityManager domainEntities) {

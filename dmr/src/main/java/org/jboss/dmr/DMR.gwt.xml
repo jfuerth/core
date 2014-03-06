@@ -23,6 +23,8 @@
     <inherits name='com.google.gwt.http.HTTP'/>
     <inherits name="com.google.gwt.debugpanel.DebugPanel_Disabled" />
 
+    <inherits name="org.jboss.errai.ioc.Container"/>
+
     <!-- export as JS API -->
     <inherits name='org.timepedia.exporter.Exporter'/>
     <set-property name="export" value="no"/>

@@ -1,14 +1,18 @@
 package org.jboss.as.console.client.core;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.enterprise.context.Dependent;
+
+import org.jboss.as.console.client.poc.POC;
+
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.TokenFormatException;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Formats tokens from {@code String} values to {@link PlaceRequest} and {@link PlaceRequest} hierarchies and vice-versa. The default implementation
@@ -28,14 +32,14 @@ import java.util.Set;
  * agent, it is still parsed correctly.
  * <p />
  * For example, {@link NewTokenFormatter} would parse any of the following:
- * 
+ *
  * <pre>
  * nameToken1%3Bparam1.1%3Dvalue1.1%3Bparam1.2%3Dvalue1.2%2FnameToken2%2FnameToken3%3Bparam3.1%3Dvalue%03%11
  * nameToken1;param1.1=value1.1;param1.2=value1.2/nameToken2/nameToken3;param3.1=value\03\21
  * </pre>
- * 
+ *
  * Into the following hierarchy of {@link PlaceRequest}:
- * 
+ *
  * <pre>
  * {
  *   { "nameToken1", { {"param1.1", "value1.1"}, {"parame1.2","value1.2"} },
@@ -43,13 +47,14 @@ import java.util.Set;
  *     "nameToken3", { {"param3.1", "value/3=1"} } }
  * }
  * </pre>
- * 
+ *
  * If you want to use different symbols as separator, use the {@link #ParameterTokenFormatter(String, String, String, String)} constructor.
- * 
+ *
  * @author Philippe Beaudoin
  * @author Yannis Gonianakis
  * @author Daniel Colchete
  */
+@Dependent @POC
 public class NewTokenFormatter implements TokenFormatter {
 
 	protected static final String DEFAULT_HIERARCHY_SEPARATOR = "/";
@@ -78,7 +83,7 @@ public class NewTokenFormatter implements TokenFormatter {
 	/**
 	 * This constructor makes it possible to use custom separators in your token formatter. The separators must be 1-letter strings, they must all be
 	 * different from one another, and they must be encoded when ran through {@link URL#encodeQueryString(String)})
-	 * 
+	 *
 	 * @param hierarchySeparator
 	 *            The symbol used to separate {@link PlaceRequest} in a hierarchy. Must be a 1-character string and can't be {@code %}.
 	 * @param paramSeparator
@@ -94,7 +99,7 @@ public class NewTokenFormatter implements TokenFormatter {
 	 * This constructor makes it possible to use custom separators and custom escape character in your token formatter. The separators and the escape
 	 * character must be 1-letter strings, they must all be different from one another, and they must be encoded when ran through
 	 * {@link URL#encodeQueryString(String)})
-	 * 
+	 *
 	 * @param hierarchySeparator
 	 *            The symbol used to separate {@link PlaceRequest} in a hierarchy. Must be a 1-character string and can't be {@code %}.
 	 * @param paramSeparator
@@ -198,7 +203,7 @@ public class NewTokenFormatter implements TokenFormatter {
 			return result;
 		}
 	}
-	
+
 	@Override
 	public String toPlaceToken(PlaceRequest placeRequest) throws TokenFormatException {
 		return toPlaceTokenUnescaped(placeRequest);
@@ -214,7 +219,7 @@ public class NewTokenFormatter implements TokenFormatter {
 				out.append(paramSeparator).append(paramValueEscape(name)).append(valueSeparator).append(paramValueEscape(placeRequest.getParameter(name, null)));
 			}
 		}
-		
+
 		return out.toString();
 	}
 
@@ -259,7 +264,7 @@ public class NewTokenFormatter implements TokenFormatter {
 
 	private String paramValueUnescape(String value) {
 		value = URL.decodeQueryString(value);
-		
+
 		StringBuffer sbuf = new StringBuffer();
 		int len = value.length();
 
@@ -288,7 +293,7 @@ public class NewTokenFormatter implements TokenFormatter {
 			} else {
 				sbuf.append(ch);
 			}
-		} 	
+		}
 
 		return sbuf.toString();
 	}

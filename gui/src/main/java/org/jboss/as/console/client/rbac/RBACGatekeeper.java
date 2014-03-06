@@ -3,13 +3,13 @@ package org.jboss.as.console.client.rbac;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.jboss.as.console.client.plugins.AccessControlRegistry;
+import org.jboss.ballroom.client.rbac.AuthorisationDecision;
+import org.jboss.ballroom.client.rbac.SecurityContext;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.gwtplatform.mvp.client.proxy.Gatekeeper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import org.jboss.as.console.client.plugins.AccessControlRegistry;
-import org.jboss.as.console.client.poc.POC;
-import org.jboss.ballroom.client.rbac.AuthorisationDecision;
-import org.jboss.ballroom.client.rbac.SecurityContext;
 
 /**
  * @author Heiko Braun
@@ -24,7 +24,7 @@ public class RBACGatekeeper implements Gatekeeper {
     @Inject
     public RBACGatekeeper(
             final AccessControlRegistry accessControlMetaData,
-            final @POC PlaceManager placemanager,
+            final PlaceManager placemanager,
             final SecurityFramework securityManager) {
         this.accessControlMetaData = accessControlMetaData;
         this.placemanager = placemanager;

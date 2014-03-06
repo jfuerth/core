@@ -20,22 +20,8 @@
 
 package org.jboss.as.console.client.core.gin;
 
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.RootPresenter;
-import com.gwtplatform.mvp.client.annotations.GaAccount;
-import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
-import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
-import com.gwtplatform.mvp.client.proxy.Gatekeeper;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.TokenFormatter;
-import org.jboss.as.console.client.administration.AdministrationPresenter;
-import org.jboss.as.console.client.administration.AdministrationView;
 import org.jboss.as.console.client.administration.audit.AuditLogPresenter;
 import org.jboss.as.console.client.administration.audit.AuditLogView;
-import org.jboss.as.console.client.administration.role.ui.RoleAssignementView;
-import org.jboss.as.console.client.administration.role.RoleAssignmentPresenter;
 import org.jboss.as.console.client.analytics.AnalyticsProvider;
 import org.jboss.as.console.client.analytics.NavigationTracker;
 import org.jboss.as.console.client.auth.CurrentUser;
@@ -43,7 +29,6 @@ import org.jboss.as.console.client.auth.SignInPagePresenter;
 import org.jboss.as.console.client.auth.SignInPageView;
 import org.jboss.as.console.client.core.ApplicationProperties;
 import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.DefaultPlaceManager;
 import org.jboss.as.console.client.core.Footer;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
@@ -77,9 +62,7 @@ import org.jboss.as.console.client.domain.hosts.general.HostPropertiesView;
 import org.jboss.as.console.client.domain.model.HostInformationStore;
 import org.jboss.as.console.client.domain.model.ProfileStore;
 import org.jboss.as.console.client.domain.model.ServerGroupStore;
-import org.jboss.as.console.client.domain.model.impl.HostInfoStoreImpl;
 import org.jboss.as.console.client.domain.model.impl.ProfileStoreImpl;
-import org.jboss.as.console.client.domain.model.impl.ServerGroupStoreImpl;
 import org.jboss.as.console.client.domain.profiles.CurrentProfileSelection;
 import org.jboss.as.console.client.domain.profiles.ProfileMgmtPresenter;
 import org.jboss.as.console.client.domain.profiles.ProfileMgmtView;
@@ -88,7 +71,6 @@ import org.jboss.as.console.client.domain.runtime.DomainRuntimeView;
 import org.jboss.as.console.client.domain.topology.TopologyPresenter;
 import org.jboss.as.console.client.domain.topology.TopologyView;
 import org.jboss.as.console.client.plugins.AccessControlRegistry;
-import org.jboss.as.console.client.plugins.AccessControlRegistryImpl;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.RuntimeLHSItemExtensionRegistryImpl;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
@@ -96,7 +78,6 @@ import org.jboss.as.console.client.plugins.SubsystemRegistryImpl;
 import org.jboss.as.console.client.rbac.HostManagementGatekeeper;
 import org.jboss.as.console.client.rbac.RBACGatekeeper;
 import org.jboss.as.console.client.rbac.SecurityFramework;
-import org.jboss.as.console.client.rbac.SecurityFrameworkImpl;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.rbac.UnauthorisedView;
 import org.jboss.as.console.client.shared.DialogPresenter;
@@ -226,12 +207,24 @@ import org.jboss.as.console.client.tools.modelling.workbench.repository.Reposito
 import org.jboss.as.console.client.tools.modelling.workbench.repository.RepositoryView;
 import org.jboss.as.console.client.tools.modelling.workbench.repository.SampleRepository;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.mbui.behaviour.CoreGUIContext;
 import org.jboss.as.console.spi.GinExtensionBinding;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.HandlerMapping;
 import org.jboss.dmr.client.dispatch.impl.DMRHandler;
 import org.jboss.dmr.client.dispatch.impl.DispatchAsyncImpl;
 import org.jboss.dmr.client.dispatch.impl.HandlerRegistry;
+
+import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.RootPresenter;
+import com.gwtplatform.mvp.client.annotations.GaAccount;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
+import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
+import com.gwtplatform.mvp.client.proxy.Gatekeeper;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.TokenFormatter;
 
 /**
  * Provides the bindings for the core UI widgets.
@@ -242,6 +235,7 @@ import org.jboss.dmr.client.dispatch.impl.HandlerRegistry;
 @GinExtensionBinding
 public class CoreUIModule extends AbstractPresenterModule {
 
+    @Override
     protected void configure() {
 
         // SPI first
@@ -282,7 +276,7 @@ public class CoreUIModule extends AbstractPresenterModule {
 
         bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
 
-        bind(PlaceManager.class).to(DefaultPlaceManager.class).in(Singleton.class);
+        bind(PlaceManager.class).toProvider(ErraiPlaceManagerProvider.class);
 
         // see http://code.google.com/p/gwt-platform/issues/detail?id=381
         //bind(TokenFormatter.class).to(ParameterTokenFormatter.class).in(Singleton.class);
@@ -294,12 +288,12 @@ public class CoreUIModule extends AbstractPresenterModule {
         bind(Gatekeeper.class).to(RBACGatekeeper.class).in(Singleton.class);
         bind(HostManagementGatekeeper.class).in(Singleton.class);
 
-        bind(CurrentUser.class).in(Singleton.class);
-        bind(BootstrapContext.class).in(Singleton.class);
-        bind(ApplicationProperties.class).to(BootstrapContext.class).in(Singleton.class);
+        bind(CurrentUser.class).toProvider(ErraiCurrentUserProvider.class);
+        bind(BootstrapContext.class).toProvider(ErraiBootstrapContextProvider.class);
+        bind(ApplicationProperties.class).toProvider(ErraiBootstrapContextProvider.class);
         bind(ApplicationMetaData.class).in(Singleton.class);
 
-        bind(DomainEntityManager.class).in(Singleton.class);
+        bind(DomainEntityManager.class).toProvider(ErraiDomainEntityManagerProvider.class);
 
         // sign in
         bindPresenter(SignInPagePresenter.class, SignInPagePresenter.MyView.class,
@@ -399,7 +393,7 @@ public class CoreUIModule extends AbstractPresenterModule {
                 TopologyView.class,
                 TopologyPresenter.MyProxy.class);
 
-        bind(CurrentProfileSelection.class).in(Singleton.class);
+        bind(CurrentProfileSelection.class).toProvider(ErraiCurrentProfileSelectionProvider.class);
         bind(ReloadState.class).in(Singleton.class);
 
         // domain/server-group
@@ -410,8 +404,8 @@ public class CoreUIModule extends AbstractPresenterModule {
 
         bind(ProfileStore.class).to(ProfileStoreImpl.class).in(Singleton.class);
         bind(SubsystemStore.class).to(SubsystemStoreImpl.class).in(Singleton.class);
-        bind(ServerGroupStore.class).to(ServerGroupStoreImpl.class).in(Singleton.class);
-        bind(HostInformationStore.class).to(HostInfoStoreImpl.class).in(Singleton.class);
+        bind(ServerGroupStore.class).toProvider(ErraiServerGroupStoreProvider.class);
+        bind(HostInformationStore.class).toProvider(ErraiHostInfoStoreProvider.class);
 
         // domain/domain-deployments
         bindPresenter(DomainDeploymentPresenter.class,
@@ -670,14 +664,6 @@ public class CoreUIModule extends AbstractPresenterModule {
                 EnvironmentPresenter.MyProxy.class);
 
         // Administration
-        bindPresenter(AdministrationPresenter.class,
-                AdministrationPresenter.MyView.class,
-                AdministrationView.class,
-                AdministrationPresenter.MyProxy.class);
-        bindPresenter(RoleAssignmentPresenter.class,
-                RoleAssignmentPresenter.MyView.class,
-                RoleAssignementView.class,
-                RoleAssignmentPresenter.MyProxy.class);
         bindPresenter(AuditLogPresenter.class,
                 AuditLogPresenter.MyView.class,
                 AuditLogView.class,
@@ -695,9 +681,11 @@ public class CoreUIModule extends AbstractPresenterModule {
         // Application
         bind(SampleRepository.class).in(Singleton.class);
 
-        bind(AccessControlRegistry.class).to(AccessControlRegistryImpl.class).in(Singleton.class);
+        bind(AccessControlRegistry.class).toProvider(ErraiAccessControlRegistryProvider.class);
 
-        bind(SecurityFramework.class).to(SecurityFrameworkImpl.class).in(Singleton.class);
+        bind(SecurityFramework.class).toProvider(ErraiSecurityFrameworkProvider.class);
+
+        bind(CoreGUIContext.class).toProvider(ErraiCoreGUIContextProvider.class);
 
         /* use this to test against 6.x until the RBAC facilities are available */
         //bind(SecurityFramework.class).to(MockSecurityFramework.class).in(Singleton.class);

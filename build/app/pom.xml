@@ -35,6 +35,9 @@
                                 <source>../../flow/core/src/main/java</source>
                                 <source>../../gui/src/main/java</source>
                             </sources>
+                            <resources>
+                                <resource>../../gui/src/main/java</resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>

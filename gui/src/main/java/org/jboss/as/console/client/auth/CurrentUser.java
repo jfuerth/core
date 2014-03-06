@@ -19,13 +19,13 @@
 
 package org.jboss.as.console.client.auth;
 
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * @author Heiko Braun
  * @date 2/7/11
  */
-@Singleton
+@ApplicationScoped
 public class CurrentUser {
 
     private boolean loggedIn;

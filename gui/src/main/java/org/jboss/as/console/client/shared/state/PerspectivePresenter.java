@@ -18,15 +18,16 @@
  */
 package org.jboss.as.console.client.shared.state;
 
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.Header;
+import org.jboss.as.console.client.rbac.UnauthorizedEvent;
+
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.core.Header;
-import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
-import org.jboss.as.console.client.rbac.UnauthorizedEvent;
 
 /**
  * Base class for top level presenters like "Configuration", "Server Health" or "Administration". Meets two tasks:
@@ -45,20 +46,18 @@ public abstract class PerspectivePresenter<V extends View, Proxy_ extends Proxy<
     private final PlaceManager placeManager;
     private final Header header;
     private final String token;
-    private final UnauthorisedPresenter unauthorisedPresenter;
     private final Object contentSlot;
     private PlaceRequest lastPlace;
     private boolean hasBeenRevealed;
 
     public PerspectivePresenter(final EventBus eventBus, final V view, final Proxy_ proxy,
             final PlaceManager placeManager, final Header header, final String token,
-            final UnauthorisedPresenter unauthorisedPresenter, Object contentSlot) {
+            Object contentSlot) {
 
         super(eventBus, view, proxy);
         this.placeManager = placeManager;
         this.header = header;
         this.token = token;
-        this.unauthorisedPresenter = unauthorisedPresenter;
         this.contentSlot = contentSlot;
     }
 
@@ -115,7 +114,7 @@ public abstract class PerspectivePresenter<V extends View, Proxy_ extends Proxy<
     @Override
     public void onUnauthorized(final UnauthorizedEvent event) {
         resetLastPlace();
-        setInSlot(contentSlot, unauthorisedPresenter);
+        setInSlot(contentSlot, Console.MODULES.getUnauthorisedPresenter());
     }
 
     /**

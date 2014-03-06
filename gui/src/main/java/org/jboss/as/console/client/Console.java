@@ -49,11 +49,13 @@ import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
 import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.Preferences;
 import org.jboss.as.console.client.shared.help.HelpSystem;
 import org.jboss.as.console.client.shared.state.ReloadNotification;
 import org.jboss.as.console.client.shared.state.ReloadState;
 import org.jboss.as.console.client.shared.state.ServerState;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.progress.ProgressPolyfill;
 import org.jboss.dmr.client.dispatch.DispatchError;
 import org.jboss.dmr.client.notify.Notifications;
@@ -85,7 +87,10 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 @EntryPoint
 public class Console implements ReloadNotification.Handler {
 
-    public final static Composite MODULES = GWT.create(Composite.class);
+    // must wait until PostConstruct before bootstrapping GIN, because it calls
+    // back into Errai's BeanManager during initialization
+    public static Composite MODULES;
+
     public final static UIConstants CONSTANTS = GWT.create(UIConstants.class);
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
@@ -93,11 +98,18 @@ public class Console implements ReloadNotification.Handler {
     @Produces @POC
     public final ProductConfig prodConfig = GWT.create(ProductConfig.class);
 
+    @Produces
+    private final BeanFactory beanFactory = GWT.create(BeanFactory.class);
+
+    @Produces
+    private final ApplicationMetaData applicationMetaData = GWT.create(ApplicationMetaData.class);
+
     @Inject
     private Workbench workbench;
 
     @PostConstruct
     public void blockWorkbenchStartup() {
+        MODULES = GWT.create(Composite.class);
         workbench.addStartupBlocker(Console.class);
         if (workbench == null) return;
         Log.setUncaughtExceptionHandler();
@@ -134,10 +146,12 @@ public class Console implements ReloadNotification.Handler {
         RootLayoutPanel.get().add(loadingPanel);
 
         GWT.runAsync(new RunAsyncCallback() {
+            @Override
             public void onFailure(Throwable caught) {
                 Window.alert("Failed to load application components!");
             }
 
+            @Override
             public void onSuccess() {
                 DelayedBindRegistry.bind(MODULES);
 
@@ -214,6 +228,13 @@ public class Console implements ReloadNotification.Handler {
         });
     }
 
+    /**
+     * Hides the "Loading" panel that exists in the host HTML page.
+     */
+    private static void hideLoadingPanel() {
+        RootPanel.get("loading-panel").removeFromParent();
+    }
+
     public static void info(String message) {
         getMessageCenter().notify(
                 new Message(message, Message.Severity.Info)
@@ -280,19 +301,8 @@ public class Console implements ReloadNotification.Handler {
         return MODULES.getMessageCenter();
     }
 
-    @Produces @POC
-    private PlaceManager getPlaceManager2() {
-        return MODULES.getPlaceManager();
-    }
-
     public static PlaceManager getPlaceManager() {
         return MODULES.getPlaceManager();
-    }
-
-    @Produces @POC
-    public BootstrapContext getBootstrapContext2()
-    {
-        return MODULES.getBootstrapContext();
     }
 
     public static BootstrapContext getBootstrapContext()

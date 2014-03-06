@@ -18,24 +18,31 @@
  */
 package org.jboss.as.console.client.administration;
 
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-import org.jboss.as.console.client.Console;
+import javax.enterprise.context.ApplicationScoped;
+
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.ballroom.client.layout.LHSNavTree;
 import org.jboss.ballroom.client.layout.LHSNavTreeItem;
 import org.jboss.ballroom.client.layout.LHSTreeSection;
+import org.uberfire.client.annotations.WorkbenchPartTitle;
+import org.uberfire.client.annotations.WorkbenchScreen;
+
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Harald Pehl
  */
-class LHSAdministrationNavigation {
+@ApplicationScoped
+@WorkbenchScreen(identifier = "LHSAdministrationNavigation")
+public class LHSAdministrationNavigation implements IsWidget {
 
-    private ScrollPanel scroll;
-    private VerticalPanel stack;
-    private VerticalPanel layout;
-    private LHSNavTree navigation;
+    private final ScrollPanel scroll;
+    private final VerticalPanel stack;
+    private final VerticalPanel layout;
+    private final LHSNavTree navigation;
 
     public LHSAdministrationNavigation() {
 
@@ -61,6 +68,12 @@ class LHSAdministrationNavigation {
         scroll = new ScrollPanel(layout);
     }
 
+    @WorkbenchPartTitle
+    public String getTitle() {
+        return "LHSAdministrationNavigation";
+    }
+
+    @Override
     public Widget asWidget() {
         return scroll;
     }

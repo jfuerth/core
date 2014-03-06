@@ -18,6 +18,12 @@
  */
 package org.jboss.as.console.client.administration.audit;
 
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -26,10 +32,6 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
 
 /**
  * @author Harald Pehl
@@ -57,7 +59,7 @@ public class AuditLogPresenter
 
     @Override
     protected void revealInParent() {
-        revealStrategy.revealInAdministration(this);
+        Window.alert("AuditLogPresenter is not yet converted to UberFire");
     }
 
     @ProxyCodeSplit

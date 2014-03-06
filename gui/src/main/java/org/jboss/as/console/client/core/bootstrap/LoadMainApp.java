@@ -4,14 +4,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.poc.POC;
+
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
-import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.NameTokens;
 
 /**
  * Either loads the default place or one specified from external context (URL tokens)
@@ -41,11 +43,11 @@ public class LoadMainApp implements Command {
         return match;
     }
 
-    private PlaceManager placeManager;
-    private TokenFormatter formatter;
-    private BootstrapContext bootstrapContext;
+    private final PlaceManager placeManager;
+    private final TokenFormatter formatter;
+    private final BootstrapContext bootstrapContext;
 
-    public LoadMainApp(BootstrapContext bootstrapContext, PlaceManager placeManager, TokenFormatter formatter) {
+    public LoadMainApp(BootstrapContext bootstrapContext, PlaceManager placeManager, @POC TokenFormatter formatter) {
         this.bootstrapContext = bootstrapContext;
         this.placeManager = placeManager;
         this.formatter = formatter;

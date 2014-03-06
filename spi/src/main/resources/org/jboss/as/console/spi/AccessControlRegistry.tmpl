@@ -2,7 +2,9 @@
 package org.jboss.as.console.client.plugins;
 
 import java.util.*;
+import javax.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class AccessControlRegistryImpl implements AccessControlRegistry{
 
     private Set<AccessControlMetaData> accessMetaData;

@@ -41,7 +41,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.layout.client.Layout;
-import com.google.gwt.user.cellview.client.FooterBuilder;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -61,17 +60,18 @@ public class Footer implements org.uberfire.client.workbench.Footer {
     public final static ProgressElement PROGRESS_ELEMENT = new ProgressElement();
 
     private final BootstrapContext context;
-    private PlaceManager placeManager;
-    private ProductConfig productConfig;
-    private Diagnostics diagnostics = GWT.create(Diagnostics.class);
+    private final PlaceManager placeManager;
+    private final ProductConfig productConfig;
+    private final Diagnostics diagnostics = GWT.create(Diagnostics.class);
 
     @Inject
-    public Footer(@POC PlaceManager placeManager, @POC ProductConfig prodConfig, @POC BootstrapContext context) {
+    public Footer(PlaceManager placeManager, @POC ProductConfig prodConfig, BootstrapContext context) {
         this.placeManager = placeManager;
         this.productConfig = prodConfig;
         this.context = context;
     }
 
+    @Override
     public Widget asWidget() {
         final LayoutPanel layout = new LayoutPanel();
         final PopupPanel toolsPopup = new DefaultPopup(DefaultPopup.Arrow.BOTTOM);
@@ -193,7 +193,7 @@ public class Footer implements org.uberfire.client.workbench.Footer {
 
         layout.ensureDebugId("THIS_IS_THE_FOOTER");
         layout.getElement().getStyle().setHeight(90, PX);
-        
+
         return layout;
     }
 

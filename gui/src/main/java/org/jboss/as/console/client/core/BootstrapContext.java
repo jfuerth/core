@@ -25,17 +25,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import org.jboss.as.console.client.ProductConfig;
 import org.jboss.as.console.client.domain.model.ProfileRecord;
 import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.StandardRole;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -44,7 +45,7 @@ import org.jboss.as.console.client.rbac.StandardRole;
 @ApplicationScoped
 public class BootstrapContext implements ApplicationProperties {
 
-    private Map<String,String> ctx = new HashMap<String,String>();
+    private final Map<String,String> ctx = new HashMap<String,String>();
     private String initialPlace = null;
     private Throwable lastError;
     private String productName;
@@ -58,8 +59,10 @@ public class BootstrapContext implements ApplicationProperties {
     private String runAs;
     private List<ProfileRecord> initialProfiles;
 
-    @Inject
-    public BootstrapContext(@POC ProductConfig productConfig) {
+    @Inject @POC ProductConfig productConfig;
+
+    @PostConstruct
+    private void init() {
 
         // Default values
         this.productName = "Management Console";

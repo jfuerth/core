@@ -85,18 +85,18 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
             new String[]{NameTokens.AdministrationPresenter, "Administration"},
     };
 
-    private MessageBar messageBar;
+    private final MessageBar messageBar;
 
     //private Map<String,Widget> appLinks = new HashMap<String, Widget>();
 
-    private ProductConfig productConfig;
-    private BootstrapContext bootstrap;
-    private MessageCenter messageCenter;
-    private PlaceManager placeManager;
+    private final ProductConfig productConfig;
+    private final BootstrapContext bootstrap;
+    private final MessageCenter messageCenter;
+    private final PlaceManager placeManager;
 
     @Inject
-    public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, @POC BootstrapContext bootstrap,
-                  @POC PlaceManager placeManager) {
+    public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, BootstrapContext bootstrap,
+                  PlaceManager placeManager) {
         this.messageBar = new MessageBar(messageCenter);
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;
@@ -106,6 +106,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
 
     }
 
+    @Override
     public Widget asWidget() {
 
         LayoutPanel outerLayout = new LayoutPanel();
@@ -190,6 +191,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         final DefaultPopup menuPopup = new DefaultPopup(DefaultPopup.Arrow.TOP);
 
         ClickHandler clickHandler = new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
 
                 int width = 120;

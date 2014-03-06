@@ -24,9 +24,9 @@ import static org.jboss.as.console.client.administration.role.model.Principal.Ty
 
 import java.util.List;
 
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
+
 import org.jboss.as.console.client.administration.role.RoleAssignmentPresenter;
 import org.jboss.as.console.client.administration.role.model.Principals;
 import org.jboss.as.console.client.administration.role.model.RoleAssignments;
@@ -34,22 +34,28 @@ import org.jboss.as.console.client.administration.role.model.Roles;
 import org.jboss.as.console.client.core.SuspendableViewImpl;
 import org.jboss.as.console.client.widgets.tabs.DefaultTabLayoutPanel;
 
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+
 /**
  * @author Harald Pehl
  */
-public class RoleAssignementView extends SuspendableViewImpl implements RoleAssignmentPresenter.MyView {
+@Dependent
+public class RoleAssignementView implements RoleAssignmentPresenter.MyView {
 
     private RoleAssignmentPresenter presenter;
     private RoleAssignmentEditor groupEditor;
     private RoleAssignmentEditor userEditor;
     private RoleEditor roleEditor;
+    private DefaultTabLayoutPanel widget;
 
     @Inject
     public RoleAssignementView() {
     }
 
-    @Override
-    public Widget createWidget() {
+    @PostConstruct
+    private void createWidget() {
         groupEditor = new RoleAssignmentEditor(presenter, GROUP);
         userEditor = new RoleAssignmentEditor(presenter, USER);
         roleEditor = new RoleEditor(presenter);
@@ -61,11 +67,11 @@ public class RoleAssignementView extends SuspendableViewImpl implements RoleAssi
         tabLayoutpanel.add(roleEditor, "Roles", true);
         tabLayoutpanel.selectTab(0);
 
-        return tabLayoutpanel;
+        widget = tabLayoutpanel;
     }
 
     @Override
-    public void setPresenter(final RoleAssignmentPresenter presenter) {
+    public void init(RoleAssignmentPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -76,4 +82,10 @@ public class RoleAssignementView extends SuspendableViewImpl implements RoleAssi
         userEditor.update(assignments, roles);
         roleEditor.update(roles, hosts, serverGroups);
     }
+
+    @Override
+    public Widget asWidget() {
+        return widget;
+    }
+
 }

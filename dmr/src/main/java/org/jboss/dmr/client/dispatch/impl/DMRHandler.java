@@ -19,6 +19,34 @@
 
 package org.jboss.dmr.client.dispatch.impl;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.INHERITED;
+import static org.jboss.dmr.client.ModelDescriptionConstants.LOCALE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OPERATIONS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.PROXIES;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_DESCRIPTION_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+
+import org.jboss.as.console.client.rbac.ResourceAccessLog;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.Property;
+import org.jboss.dmr.client.dispatch.ActionHandler;
+import org.jboss.dmr.client.dispatch.Diagnostics;
+import org.jboss.dmr.client.dispatch.DispatchError;
+import org.jboss.dmr.client.dispatch.DispatchRequest;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -29,24 +57,12 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import org.jboss.as.console.client.rbac.ResourceAccessLog;
-import org.jboss.dmr.client.ModelNode;
-import org.jboss.dmr.client.Property;
-import org.jboss.dmr.client.dispatch.ActionHandler;
-import org.jboss.dmr.client.dispatch.Diagnostics;
-import org.jboss.dmr.client.dispatch.DispatchError;
-import org.jboss.dmr.client.dispatch.DispatchRequest;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
  * @date 3/17/11
  */
+@ApplicationScoped
 public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
 
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
@@ -66,21 +82,19 @@ public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
 
     private static long idCounter = 0;
 
-    private final RequestBuilder postRequestBuilder;
-    private Diagnostics diagnostics = GWT.create(Diagnostics.class);
-    private boolean trackInvocations = diagnostics.isEnabled();
-    private DMREndpointConfig endpointConfig = GWT.create(DMREndpointConfig.class);
-    private ResourceAccessLog resourceLog = ResourceAccessLog.INSTANCE;
+    private RequestBuilder postRequestBuilder;
+    private final Diagnostics diagnostics = GWT.create(Diagnostics.class);
+    private final boolean trackInvocations = diagnostics.isEnabled();
+    private final DMREndpointConfig endpointConfig = GWT.create(DMREndpointConfig.class);
+    private final ResourceAccessLog resourceLog = ResourceAccessLog.INSTANCE;
 
-    @Inject
-    public DMRHandler()
-    {
+    @PostConstruct
+    private void init() {
         postRequestBuilder = new RequestBuilder(RequestBuilder.POST, endpointConfig.getUrl());
         postRequestBuilder.setHeader(HEADER_ACCEPT, DMR_ENCODED);
         postRequestBuilder.setHeader(HEADER_CONTENT_TYPE, DMR_ENCODED);
         postRequestBuilder.setIncludeCredentials(true);
     }
-
 
     private static native void redirect(String url)/*-{
         $wnd.location = url;
@@ -365,7 +379,7 @@ public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
         RECEIVE("responseReceived"),
         SERIALIZED("requestSerialized"),
         DESERIALIZED("responseDeserialized");
-        private String classifier;
+        private final String classifier;
 
         private Type(String classifier)
         {
@@ -381,7 +395,7 @@ public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
 
     class DispatchRequestHandle implements DispatchRequest
     {
-        private Request delegate;
+        private final Request delegate;
 
         DispatchRequestHandle(Request delegate)
         {

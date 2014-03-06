@@ -5,20 +5,20 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.NOT_SET;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.model.Host;
 import org.jboss.as.console.client.domain.model.HostInformationStore;
 import org.jboss.as.console.client.domain.model.Server;
 import org.jboss.as.console.client.domain.model.ServerInstance;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
+
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * Domain entity manager corresponds to the picker (host, server) that rely on the host data:
@@ -28,7 +28,7 @@ import org.jboss.as.console.client.shared.BeanFactory;
  * @author Heiko Braun
  * @date 12/10/12
  */
-@Singleton
+@ApplicationScoped
 public class DomainEntityManager implements
         GlobalHostSelection.HostSelectionListener,
         GlobalServerSelection.ServerSelectionListener, StaleGlobalModel.StaleModelListener {
@@ -42,7 +42,7 @@ public class DomainEntityManager implements
     private final BeanFactory factory;
 
     @Inject
-    public DomainEntityManager(HostInformationStore hostInfo, @POC BeanFactory factory) {
+    public DomainEntityManager(HostInformationStore hostInfo, BeanFactory factory) {
         this.hostInfo = hostInfo;
         this.eventBus = Console.getEventBus();
         this.factory = factory;
@@ -287,8 +287,8 @@ public class DomainEntityManager implements
     }
 
     public class ServerSelection {
-        private String name;
-        private boolean running;
+        private final String name;
+        private final boolean running;
 
         ServerSelection(String name, boolean running) {
             this.name = name;

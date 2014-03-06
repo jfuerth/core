@@ -19,21 +19,15 @@
 package org.jboss.as.console.client.administration.role;
 
 import static org.jboss.as.console.client.administration.role.model.Principal.Type.USER;
-import static org.jboss.as.console.client.administration.role.operation.ManagementOperation.Operation.*;
+import static org.jboss.as.console.client.administration.role.operation.ManagementOperation.Operation.ADD;
+import static org.jboss.as.console.client.administration.role.operation.ManagementOperation.Operation.MODIFY;
+import static org.jboss.as.console.client.administration.role.operation.ManagementOperation.Operation.REMOVE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.Proxy;
+import javax.enterprise.context.ApplicationScoped;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.administration.role.model.Principal;
 import org.jboss.as.console.client.administration.role.model.Principals;
@@ -41,7 +35,6 @@ import org.jboss.as.console.client.administration.role.model.Role;
 import org.jboss.as.console.client.administration.role.model.RoleAssignment;
 import org.jboss.as.console.client.administration.role.model.RoleAssignments;
 import org.jboss.as.console.client.administration.role.model.Roles;
-import org.jboss.as.console.client.shared.flow.FunctionContext;
 import org.jboss.as.console.client.administration.role.operation.LoadRoleAssignmentsOp;
 import org.jboss.as.console.client.administration.role.operation.ManagementOperation;
 import org.jboss.as.console.client.administration.role.operation.ModifyRoleAssignmentOp;
@@ -51,14 +44,23 @@ import org.jboss.as.console.client.administration.role.ui.AccessControlProviderD
 import org.jboss.as.console.client.administration.role.ui.AddRoleAssignmentWizard;
 import org.jboss.as.console.client.administration.role.ui.AddScopedRoleWizard;
 import org.jboss.as.console.client.administration.role.ui.MembersDialog;
+import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.model.HostInformationStore;
 import org.jboss.as.console.client.domain.model.ServerGroupStore;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.spi.AccessControl;
+import org.jboss.as.console.client.shared.flow.FunctionContext;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.gwt.flow.client.Outcome;
+import org.uberfire.client.annotations.WorkbenchPartTitle;
+import org.uberfire.client.annotations.WorkbenchPartView;
+import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.mvp.UberView;
+import org.uberfire.lifecycle.OnOpen;
+
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 /**
  * There are some constraints when managing role assignments in the console:
@@ -71,13 +73,20 @@ import org.jboss.gwt.flow.client.Outcome;
  *
  * @author Harald Pehl
  */
-public class RoleAssignmentPresenter
-        extends Presenter<RoleAssignmentPresenter.MyView, RoleAssignmentPresenter.MyProxy> {
+
+// annotations that were on the GWTP view interface
+//@ProxyCodeSplit
+//@NameToken(NameTokens.RoleAssignmentPresenter)
+//@AccessControl(resources = {"/core-service=management/access=authorization"}, recursive = false)
+
+@ApplicationScoped
+@WorkbenchScreen(identifier=NameTokens.RoleAssignmentPresenter) // TODO: consider WorkbenchEditor, which can warn about unsaved changes
+public class RoleAssignmentPresenter {
 
     static final String SIMPLE_ACCESS_CONTROL_PROVIDER = "simple";
-    private final boolean standalone;
-    private final RevealStrategy revealStrategy;
+    private final MyView view;
     private final DispatchAsync dispatcher;
+    private final BootstrapContext bootstrapContext;
     private final ManagementOperation<FunctionContext> loadRoleAssignmentsOp;
     private boolean initialized;
     private DefaultWindow window;
@@ -90,14 +99,13 @@ public class RoleAssignmentPresenter
     // ------------------------------------------------------ presenter lifecycle
 
     @Inject
-    public RoleAssignmentPresenter(final EventBus eventBus, final MyView view, final MyProxy proxy,
-            final RevealStrategy revealStrategy, final DispatchAsync dispatcher,
-            final HostInformationStore hostInformationStore, ServerGroupStore serverGroupStore) {
-        super(eventBus, view, proxy);
+    public RoleAssignmentPresenter(final MyView view, final DispatchAsync dispatcher,
+            final HostInformationStore hostInformationStore, ServerGroupStore serverGroupStore,
+            BootstrapContext bootstrapContext) {
 
-        this.standalone = Console.getBootstrapContext().isStandalone();
-        this.revealStrategy = revealStrategy;
+        this.view = view;
         this.dispatcher = dispatcher;
+        this.bootstrapContext = bootstrapContext;
         this.loadRoleAssignmentsOp = new LoadRoleAssignmentsOp(this, dispatcher, hostInformationStore,
                 serverGroupStore);
 
@@ -111,20 +119,18 @@ public class RoleAssignmentPresenter
         this.initialized = false;
     }
 
-    @Override
-    protected void onBind() {
-        super.onBind();
-        getView().setPresenter(this);
+    @WorkbenchPartView
+    public MyView getView() {
+        return view;
     }
 
-    @Override
-    protected void revealInParent() {
-        revealStrategy.revealInAdministration(this);
+    @WorkbenchPartTitle
+    public String getTitle() {
+        return "Role Assignment";
     }
 
-    @Override
-    protected void onReset() {
-        super.onReset();
+    @OnOpen
+    protected void onOpen() {
         loadAssignments();
     }
 
@@ -160,7 +166,7 @@ public class RoleAssignmentPresenter
                     roles = context.get(LoadRoleAssignmentsOp.ROLES);
                     hosts = context.get(LoadRoleAssignmentsOp.HOSTS);
                     serverGroups = context.get(LoadRoleAssignmentsOp.SERVER_GROUPS);
-                    getView().update(principals, assignments, roles, hosts, serverGroups);
+                    view.update(principals, assignments, roles, hosts, serverGroups);
 
                     // show warning about simple access control provider (if not already done)
                     if (!initialized) {
@@ -267,7 +273,7 @@ public class RoleAssignmentPresenter
     }
 
     private boolean assertDomainMode() {
-        if (standalone) {
+        if (bootstrapContext.isStandalone()) {
             Log.error("Scoped roles are not supported in standalone mode!");
             return false;
         }
@@ -322,20 +328,12 @@ public class RoleAssignmentPresenter
     }
 
     public boolean isStandalone() {
-        return standalone;
+        return bootstrapContext.isStandalone();
     }
 
     // ------------------------------------------------------ inner classes
 
-    @ProxyCodeSplit
-    @NameToken(NameTokens.RoleAssignmentPresenter)
-    @AccessControl(resources = {"/core-service=management/access=authorization"}, recursive = false)
-    public interface MyProxy extends Proxy<RoleAssignmentPresenter>, Place {
-    }
-
-    public interface MyView extends View {
-
-        void setPresenter(final RoleAssignmentPresenter presenter);
+    public interface MyView extends UberView<RoleAssignmentPresenter> {
 
         void update(final Principals principals, final RoleAssignments assignments, final Roles roles,
                 final List<String> hosts, final List<String> serverGroups);
@@ -372,6 +370,7 @@ public class RoleAssignmentPresenter
             loadAssignments();
         }
 
+        @Override
         public void onFailure(final FunctionContext context) {
             if (context.isForbidden()) {
                 Console.error(failureMessage, Console.CONSTANTS.unauthorized_desc());

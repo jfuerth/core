@@ -19,8 +19,6 @@
 
     <properties>
         <console.profile>jboss</console.profile>
-        <errai.version>3.0.0.20131205-M3</errai.version>
-        <uberfire.version>0.5.0-SNAPSHOT</uberfire.version>
     </properties>
 
 

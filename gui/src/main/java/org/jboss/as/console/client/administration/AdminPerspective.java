@@ -4,11 +4,12 @@ import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.standalone.ServerMgmtApplicationPresenter;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.lifecycle.OnClose;
-import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
+import org.uberfire.workbench.model.Position;
+import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 import org.uberfire.workbench.model.impl.PartDefinitionImpl;
 import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
 
@@ -34,8 +35,20 @@ public class AdminPerspective {
         p.setTransient(true);
         p.setName(NameTokens.serverConfig);
 
-        p.getRoot().addPart(new PartDefinitionImpl(new DefaultPlaceRequest("AdminPresenterScreen")));
+        p.getRoot().addPart(new PartDefinitionImpl(
+                new DefaultPlaceRequest(NameTokens.RoleAssignmentPresenter)));
+
+        PanelDefinition lhsNavPanel = new PanelDefinitionImpl(PanelType.STATIC);
+        p.getRoot().insertChild(Position.WEST, lhsNavPanel);
+        lhsNavPanel.setWidth(217);
+        lhsNavPanel.addPart(new PartDefinitionImpl(
+                new DefaultPlaceRequest("LHSAdministrationNavigation")));
+
+     // TODO        contentCanvas.getElement().setAttribute("role", "main");
+     // TODO        navigationWidget.getElement().setAttribute("role", "navigation");
+
         return p;
     }
+
 
 }

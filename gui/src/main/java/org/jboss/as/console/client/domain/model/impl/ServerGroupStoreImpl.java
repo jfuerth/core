@@ -25,10 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import org.jboss.as.console.client.domain.model.ServerGroupRecord;
 import org.jboss.as.console.client.domain.model.ServerGroupStore;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
@@ -50,6 +52,7 @@ import org.jboss.dmr.client.dispatch.impl.DMRResponse;
  * @author Heiko Braun
  * @date 3/18/11
  */
+@ApplicationScoped
 public class ServerGroupStoreImpl implements ServerGroupStore {
 
     private DispatchAsync dispatcher;

@@ -19,17 +19,7 @@
 
 package org.jboss.as.console.client.core.gin;
 
-import com.google.gwt.inject.client.AsyncProvider;
-import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
-import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
-import com.gwtplatform.mvp.client.proxy.Gatekeeper;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.TokenFormatter;
-import org.jboss.as.console.client.administration.AdministrationPresenter;
 import org.jboss.as.console.client.administration.audit.AuditLogPresenter;
-import org.jboss.as.console.client.administration.role.RoleAssignmentPresenter;
 import org.jboss.as.console.client.analytics.NavigationTracker;
 import org.jboss.as.console.client.auth.CurrentUser;
 import org.jboss.as.console.client.auth.SignInPagePresenter;
@@ -139,6 +129,15 @@ import org.jboss.as.console.spi.GinExtension;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.HandlerMapping;
 import org.jboss.dmr.client.dispatch.impl.DMRHandler;
+
+import com.google.gwt.inject.client.AsyncProvider;
+import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
+import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
+import com.gwtplatform.mvp.client.proxy.Gatekeeper;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.TokenFormatter;
 
 
 /**
@@ -331,8 +330,6 @@ public interface CoreUI {
     AsyncProvider<EnvironmentPresenter> EnvironmentPresenter();
 
     // Administration
-    AsyncProvider<AdministrationPresenter> getAdministrationPresenter();
-    AsyncProvider<RoleAssignmentPresenter> getRoleAssignmentPresenter();
     AsyncProvider<AuditLogPresenter> getAuditLogPresenter();
 
     // mbui workbench

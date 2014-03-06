@@ -22,17 +22,12 @@ package org.jboss.as.console.client.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.proxy.PlaceManagerImpl;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import com.gwtplatform.mvp.client.proxy.TokenFormatter;
+import javax.enterprise.context.ApplicationScoped;
+
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.ReadOnlyContext;
 import org.jboss.as.console.client.rbac.SecurityFramework;
-import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.rbac.UnauthorizedEvent;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
 import org.jboss.ballroom.client.rbac.SecurityContext;
@@ -41,25 +36,32 @@ import org.jboss.gwt.flow.client.Control;
 import org.jboss.gwt.flow.client.Function;
 import org.jboss.gwt.flow.client.Outcome;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.proxy.PlaceManagerImpl;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.TokenFormatter;
+
 /**
  * @author Heiko Braun
  * @date 2/4/11
  */
+@ApplicationScoped
 public class DefaultPlaceManager extends PlaceManagerImpl {
 
     private final SecurityFramework securityFramework;
-    private final UnauthorisedPresenter unauthPlace;
-    private BootstrapContext bootstrap;
-    private EventBus eventBus;
+    private final BootstrapContext bootstrap;
+    private final EventBus eventBus;
 
     @Inject
-    public DefaultPlaceManager(EventBus eventBus, TokenFormatter tokenFormatter, BootstrapContext bootstrap,
-            SecurityFramework securityManager, UnauthorisedPresenter unauthPlace) {
+    public DefaultPlaceManager(EventBus eventBus, @POC TokenFormatter tokenFormatter, BootstrapContext bootstrap,
+            SecurityFramework securityManager) {
         super(eventBus, tokenFormatter);
         this.bootstrap = bootstrap;
         this.eventBus = eventBus;
         this.securityFramework = securityManager;
-        this.unauthPlace = unauthPlace;
     }
 
     @Override
@@ -68,6 +70,7 @@ public class DefaultPlaceManager extends PlaceManagerImpl {
         revealDefaultPlace();
     }
 
+    @Override
     public void revealDefaultPlace() {
 
         List<PlaceRequest> places = new ArrayList<PlaceRequest>();

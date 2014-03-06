@@ -19,7 +19,20 @@
 
 package org.jboss.as.console.client.domain.model.impl;
 
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.INCLUDE_RUNTIME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NOT_SET;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_NAMES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +42,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.inject.Inject;
+import javax.enterprise.context.ApplicationScoped;
+
 import org.jboss.as.console.client.domain.model.Host;
 import org.jboss.as.console.client.domain.model.HostInformationStore;
 import org.jboss.as.console.client.domain.model.Server;
@@ -41,7 +51,6 @@ import org.jboss.as.console.client.domain.model.ServerFlag;
 import org.jboss.as.console.client.domain.model.ServerInstance;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.domain.topology.HostInfo;
-import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.jvm.Jvm;
 import org.jboss.as.console.client.shared.model.ModelAdapter;
@@ -56,21 +65,28 @@ import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.impl.DMRAction;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.inject.Inject;
+
 /**
  * @author Heiko Braun
  * @date 3/18/11
  */
+@ApplicationScoped
 public class HostInfoStoreImpl implements HostInformationStore {
 
-    private DispatchAsync dispatcher;
-    private BeanFactory factory;
-    private ApplicationMetaData propertyMetaData;
-    private EntityAdapter<Server> serverAdapter;
-    private EntityAdapter<Jvm> jvmAdapter;
-    private EntityAdapter<PropertyRecord> propertyAdapter;
+    private final DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final ApplicationMetaData propertyMetaData;
+    private final EntityAdapter<Server> serverAdapter;
+    private final EntityAdapter<Jvm> jvmAdapter;
+    private final EntityAdapter<PropertyRecord> propertyAdapter;
 
     @Inject
-    public HostInfoStoreImpl(DispatchAsync dispatcher, @POC BeanFactory factory, @POC ApplicationMetaData propertyMeta) {
+    public HostInfoStoreImpl(DispatchAsync dispatcher, BeanFactory factory, ApplicationMetaData propertyMeta) {
         this.dispatcher = dispatcher;
         this.factory = factory;
         this.propertyMetaData = propertyMeta;
@@ -337,6 +353,7 @@ public class HostInfoStoreImpl implements HostInformationStore {
         });
     }
 
+    @Override
     public void getVirtualMachines(String host, final AsyncCallback<List<String>> callback) {
         final ModelNode operation = new ModelNode();
         operation.get(OP).set(READ_CHILDREN_NAMES_OPERATION);
@@ -619,6 +636,7 @@ public class HostInfoStoreImpl implements HostInformationStore {
     }
 
 
+    @Override
     public void updateServerInstance(String host, final Server handle, final AsyncCallback<ServerInstance> callback) {
 
 
