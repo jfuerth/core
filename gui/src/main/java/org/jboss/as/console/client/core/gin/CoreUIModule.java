@@ -255,7 +255,7 @@ public class CoreUIModule extends AbstractPresenterModule {
 
         // main layout
         bind(Header.class).toProvider(ErraiHeaderProvider.class);
-        bind(Footer.class).in(Singleton.class);
+        bind(Footer.class).toProvider(ErraiFooterProvider.class);
 
         // supporting components
         bind(MessageBar.class).in(Singleton.class);

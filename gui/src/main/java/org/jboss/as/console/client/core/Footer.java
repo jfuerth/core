@@ -24,10 +24,24 @@ import static com.google.gwt.dom.client.Style.Unit.PX;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.ProductConfig;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.widgets.popups.DefaultPopup;
+import org.jboss.as.console.client.widgets.progress.ProgressElement;
+import org.jboss.ballroom.client.widgets.InlineLink;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.ballroom.client.widgets.window.DialogueOptions;
+import org.jboss.ballroom.client.widgets.window.WindowContentBuilder;
+import org.jboss.dmr.client.dispatch.Diagnostics;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.layout.client.Layout;
+import com.google.gwt.user.cellview.client.FooterBuilder;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -37,20 +51,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.ProductConfig;
-import org.jboss.as.console.client.widgets.popups.DefaultPopup;
-import org.jboss.as.console.client.widgets.progress.ProgressElement;
-import org.jboss.ballroom.client.widgets.InlineLink;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.ballroom.client.widgets.window.DialogueOptions;
-import org.jboss.ballroom.client.widgets.window.WindowContentBuilder;
-import org.jboss.dmr.client.dispatch.Diagnostics;
 
 /**
  * @author Heiko Braun
  */
-public class Footer {
+@ApplicationScoped
+public class Footer implements org.uberfire.client.workbench.Footer {
 
     public final static ProgressElement PROGRESS_ELEMENT = new ProgressElement();
 
@@ -60,7 +66,7 @@ public class Footer {
     private Diagnostics diagnostics = GWT.create(Diagnostics.class);
 
     @Inject
-    public Footer(PlaceManager placeManager, ProductConfig prodConfig, BootstrapContext context) {
+    public Footer(@POC PlaceManager placeManager, @POC ProductConfig prodConfig, @POC BootstrapContext context) {
         this.placeManager = placeManager;
         this.productConfig = prodConfig;
         this.context = context;
@@ -185,6 +191,14 @@ public class Footer {
         layout.setWidgetHorizontalPosition(tools, Layout.Alignment.END);
         layout.getElement().setAttribute("role", "complementary");
 
+        layout.ensureDebugId("THIS_IS_THE_FOOTER");
+        layout.getElement().getStyle().setHeight(90, PX);
+        
         return layout;
+    }
+
+    @Override
+    public int getOrder() {
+        return -10;
     }
 }
