@@ -19,22 +19,12 @@
 
 package org.jboss.as.console.client.domain.hosts.general;
 
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import java.util.List;
+
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.hosts.HostMgmtPresenter;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.properties.CreatePropertyCmd;
 import org.jboss.as.console.client.shared.properties.DeletePropertyCmd;
@@ -49,7 +39,19 @@ import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 
-import java.util.List;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.Proxy;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  * @author Heiko Braun
@@ -59,8 +61,8 @@ public class HostPropertiesPresenter extends Presenter<HostPropertiesPresenter.M
         implements PropertyManagement, HostSelectionChanged.ChangeListener {
 
     private final PlaceManager placeManager;
-    private BeanFactory factory;
-    private DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final DispatchAsync dispatcher;
     private DefaultWindow propertyWindow;
     private final DomainEntityManager domainManager;
 
@@ -80,7 +82,7 @@ public class HostPropertiesPresenter extends Presenter<HostPropertiesPresenter.M
     @Inject
     public HostPropertiesPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, DispatchAsync dispatcher,
+            @POC PlaceManager placeManager, DispatchAsync dispatcher,
             BeanFactory factory, DomainEntityManager domainManager) {
         super(eventBus, view, proxy);
 
@@ -129,10 +131,12 @@ public class HostPropertiesPresenter extends Presenter<HostPropertiesPresenter.M
         RevealContentEvent.fire(this, HostMgmtPresenter.TYPE_MainContent, this);
     }
 
+    @Override
     public void closePropertyDialoge() {
         propertyWindow.hide();
     }
 
+    @Override
     public void launchNewPropertyDialoge(String group) {
 
         propertyWindow = new DefaultWindow("New Host Property");
@@ -153,6 +157,7 @@ public class HostPropertiesPresenter extends Presenter<HostPropertiesPresenter.M
         propertyWindow.center();
     }
 
+    @Override
     public void onCreateProperty(final String groupName, final PropertyRecord prop)
     {
 
@@ -176,6 +181,7 @@ public class HostPropertiesPresenter extends Presenter<HostPropertiesPresenter.M
 
     }
 
+    @Override
     public void onDeleteProperty(final String groupName, final PropertyRecord prop)
     {
         ModelNode address = new ModelNode();

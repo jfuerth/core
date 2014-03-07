@@ -19,6 +19,11 @@
 
 package org.jboss.as.console.client.core;
 
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.expr.ExpressionResolver;
+import org.jboss.as.console.client.shared.expr.ExpressionTool;
+import org.jboss.ballroom.client.widgets.forms.ResolveExpressionEvent;
+
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.inject.Inject;
@@ -33,9 +38,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
-import org.jboss.as.console.client.shared.expr.ExpressionResolver;
-import org.jboss.as.console.client.shared.expr.ExpressionTool;
-import org.jboss.ballroom.client.widgets.forms.ResolveExpressionEvent;
 
 /**
  * @author Heiko Braun
@@ -46,11 +48,11 @@ public class MainLayoutPresenter
         implements ResolveExpressionEvent.ExpressionResolveListener, LogoutEvent.LogoutHandler {
 
     boolean revealDefault = true;
-    private BootstrapContext bootstrap;
+    private final BootstrapContext bootstrap;
 
-    private ExpressionTool expressionTool;
+    private final ExpressionTool expressionTool;
 
-    private PlaceManager placeManager;
+    private final PlaceManager placeManager;
 
     public interface MainLayoutView extends View {
     }
@@ -68,7 +70,7 @@ public class MainLayoutPresenter
             EventBus eventBus,
             MainLayoutView view,
             MainLayoutProxy proxy, BootstrapContext bootstrap,
-            ExpressionResolver resolver, PlaceManager placeManager) {
+            ExpressionResolver resolver, @POC PlaceManager placeManager) {
         super(eventBus, view, proxy);
         this.bootstrap = bootstrap;
         this.expressionTool = new ExpressionTool(resolver);

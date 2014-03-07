@@ -24,14 +24,12 @@ import static org.jboss.as.console.client.administration.role.model.Principal.Ty
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.as.console.client.administration.role.RoleAssignmentPresenter;
 import org.jboss.as.console.client.administration.role.model.Principals;
 import org.jboss.as.console.client.administration.role.model.RoleAssignments;
 import org.jboss.as.console.client.administration.role.model.Roles;
-import org.jboss.as.console.client.core.SuspendableViewImpl;
 import org.jboss.as.console.client.widgets.tabs.DefaultTabLayoutPanel;
 
 import com.google.gwt.dom.client.Style;
@@ -54,22 +52,6 @@ public class RoleAssignementView implements RoleAssignmentPresenter.MyView {
     public RoleAssignementView() {
     }
 
-    @PostConstruct
-    private void createWidget() {
-        groupEditor = new RoleAssignmentEditor(presenter, GROUP);
-        userEditor = new RoleAssignmentEditor(presenter, USER);
-        roleEditor = new RoleEditor(presenter);
-
-        DefaultTabLayoutPanel tabLayoutpanel = new DefaultTabLayoutPanel(40, Style.Unit.PX);
-        tabLayoutpanel.addStyleName("default-tabpanel");
-        tabLayoutpanel.add(userEditor, "Users", true);
-        tabLayoutpanel.add(groupEditor, "Groups", true);
-        tabLayoutpanel.add(roleEditor, "Roles", true);
-        tabLayoutpanel.selectTab(0);
-
-        widget = tabLayoutpanel;
-    }
-
     @Override
     public void init(RoleAssignmentPresenter presenter) {
         this.presenter = presenter;
@@ -85,6 +67,20 @@ public class RoleAssignementView implements RoleAssignmentPresenter.MyView {
 
     @Override
     public Widget asWidget() {
+        if (widget == null) {
+            groupEditor = new RoleAssignmentEditor(presenter, GROUP);
+            userEditor = new RoleAssignmentEditor(presenter, USER);
+            roleEditor = new RoleEditor(presenter);
+
+            DefaultTabLayoutPanel tabLayoutpanel = new DefaultTabLayoutPanel(40, Style.Unit.PX);
+            tabLayoutpanel.addStyleName("default-tabpanel");
+            tabLayoutpanel.add(userEditor, "Users", true);
+            tabLayoutpanel.add(groupEditor, "Groups", true);
+            tabLayoutpanel.add(roleEditor, "Roles", true);
+            tabLayoutpanel.selectTab(0);
+
+            widget = tabLayoutpanel;
+        }
         return widget;
     }
 

@@ -1,5 +1,30 @@
 package org.jboss.as.console.client.shared.subsys.tx;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.INCLUDE_RUNTIME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+
+import java.util.Map;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.model.ModelAdapter;
+import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.tx.model.TransactionManager;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.BeanMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.as.console.spi.SubsystemExtension;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -9,26 +34,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.model.ModelAdapter;
-import org.jboss.as.console.client.shared.subsys.Baseadress;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.tx.model.TransactionManager;
-import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
-import org.jboss.as.console.client.widgets.forms.BeanMetaData;
-import org.jboss.as.console.client.widgets.forms.EntityAdapter;
-import org.jboss.as.console.spi.SubsystemExtension;
-import org.jboss.dmr.client.ModelNode;
-
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 
 /**
@@ -38,11 +43,11 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 public class TransactionPresenter extends Presenter<TransactionPresenter.MyView, TransactionPresenter.MyProxy> {
 
     private final PlaceManager placeManager;
-    private DispatchAsync dispatcher;
-    private RevealStrategy revealStrategy;
-    private ApplicationMetaData metaData;
-    private BeanMetaData beanMetaData ;
-    private EntityAdapter<TransactionManager> entityAdapter;
+    private final DispatchAsync dispatcher;
+    private final RevealStrategy revealStrategy;
+    private final ApplicationMetaData metaData;
+    private final BeanMetaData beanMetaData ;
+    private final EntityAdapter<TransactionManager> entityAdapter;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.TransactionPresenter)
@@ -59,7 +64,7 @@ public class TransactionPresenter extends Presenter<TransactionPresenter.MyView,
     @Inject
     public TransactionPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,DispatchAsync dispatcher,
+            @POC PlaceManager placeManager,DispatchAsync dispatcher,
             RevealStrategy revealStrategy,
             ApplicationMetaData metaData)
     {

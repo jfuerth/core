@@ -48,7 +48,7 @@ import com.gwtplatform.mvp.client.proxy.TokenFormatter;
  * @author Heiko Braun
  * @date 2/4/11
  */
-@ApplicationScoped
+@ApplicationScoped @POC
 public class DefaultPlaceManager extends PlaceManagerImpl {
 
     private final SecurityFramework securityFramework;

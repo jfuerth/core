@@ -18,6 +18,24 @@
  */
 package org.jboss.as.console.client.shared.runtime.naming;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.LoggingCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.runtime.RuntimeBaseAddress;
+import org.jboss.as.console.client.shared.state.DomainEntityManager;
+import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.cellview.client.CellTree;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -30,21 +48,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.LoggingCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.runtime.RuntimeBaseAddress;
-import org.jboss.as.console.client.shared.state.DomainEntityManager;
-import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.dmr.client.ModelNode;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -54,10 +57,10 @@ public class JndiPresenter extends Presenter<JndiPresenter.MyView, JndiPresenter
         implements ServerSelectionChanged.ChangeListener {
 
     private final PlaceManager placeManager;
-    private RevealStrategy revealStrategy;
-    private DispatchAsync dispatcher;
-    private BeanFactory factory;
-    private DomainEntityManager domainEntityManager;
+    private final RevealStrategy revealStrategy;
+    private final DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final DomainEntityManager domainEntityManager;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.JndiPresenter)
@@ -83,7 +86,7 @@ public class JndiPresenter extends Presenter<JndiPresenter.MyView, JndiPresenter
     @Inject
     public JndiPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, RevealStrategy revealStrategy,
+            @POC PlaceManager placeManager, RevealStrategy revealStrategy,
             DispatchAsync dispatcher, BeanFactory factory,
             DomainEntityManager domainEntityManager) {
 

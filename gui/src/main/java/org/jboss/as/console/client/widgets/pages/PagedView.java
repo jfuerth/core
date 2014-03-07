@@ -1,17 +1,15 @@
 package org.jboss.as.console.client.widgets.pages;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import org.jboss.as.console.client.Console;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Heiko Braun
@@ -19,11 +17,11 @@ import java.util.List;
  */
 public class PagedView {
 
-    private DeckPanel deck;
-    private LinkBar bar;
+    private final DeckPanel deck;
+    private final LinkBar bar;
     private boolean navOnFirstPage = false;
     private Widget navigationBar;
-    private List<PageCallback> callbacks = new LinkedList<PageCallback>();
+    private final List<PageCallback> callbacks = new LinkedList<PageCallback>();
 
     public PagedView(boolean navOnFirstPage) {
         this.navOnFirstPage = navOnFirstPage;
@@ -92,9 +90,10 @@ public class PagedView {
          // TODO: clear history tokens
         if(index==0)
         {
-            PlaceManager placeManager = Console.getPlaceManager();
-            String nameToken = placeManager.getCurrentPlaceRequest().getNameToken();
-            History.newItem(nameToken, false);
+//            PlaceManager placeManager = Console.getPlaceManager();
+//            String nameToken = placeManager.getCurrentPlaceRequest().getNameToken();
+//            History.newItem(nameToken, false);
+            Window.alert("Not updating nav history (needs UberFire conversion)");
         }
 
         deck.showWidget(index);

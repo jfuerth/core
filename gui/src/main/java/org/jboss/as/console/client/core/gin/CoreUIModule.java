@@ -215,7 +215,6 @@ import org.jboss.dmr.client.dispatch.impl.DMRHandler;
 import org.jboss.dmr.client.dispatch.impl.DispatchAsyncImpl;
 import org.jboss.dmr.client.dispatch.impl.HandlerRegistry;
 
-import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.RootPresenter;
@@ -274,7 +273,7 @@ public class CoreUIModule extends AbstractPresenterModule {
 
         // ----------------------------------------------------------------------
 
-        bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
+        bind(EventBus.class).toProvider(ErraiSimpleEventBusProvider.class);
 
         bind(PlaceManager.class).toProvider(ErraiPlaceManagerProvider.class);
 

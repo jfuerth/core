@@ -1,28 +1,19 @@
 package org.jboss.as.console.client.shared.runtime.ds;
 
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.INCLUDE_RUNTIME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.core.client.Scheduler;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.Proxy;
-
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.model.LoggingCallback;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.runtime.Metric;
 import org.jboss.as.console.client.shared.runtime.RuntimeBaseAddress;
 import org.jboss.as.console.client.shared.state.DomainEntityManager;
@@ -38,6 +29,18 @@ import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.impl.DMRAction;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.core.client.Scheduler;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.Proxy;
+
 /**
  * @author Heiko Braun
  * @date 12/19/11
@@ -47,13 +50,13 @@ public class DataSourceMetricPresenter extends Presenter<DataSourceMetricPresent
         implements ServerSelectionChanged.ChangeListener {
 
     private final PlaceManager placeManager;
-    private DispatchAsync dispatcher;
-    private RevealStrategy revealStrategy;
+    private final DispatchAsync dispatcher;
+    private final RevealStrategy revealStrategy;
     private DataSource selectedDS;
-    private BeanFactory factory;
+    private final BeanFactory factory;
     private EntityAdapter<DataSource> dataSourceAdapter;
 
-    private LoadDataSourceCmd loadDSCmd;
+    private final LoadDataSourceCmd loadDSCmd;
     private DataSource selectedXA;
     private final DomainEntityManager domainManager;
 
@@ -79,7 +82,7 @@ public class DataSourceMetricPresenter extends Presenter<DataSourceMetricPresent
     @Inject
     public DataSourceMetricPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,  DispatchAsync dispatcher,
+            @POC PlaceManager placeManager,  DispatchAsync dispatcher,
             ApplicationMetaData metaData, RevealStrategy revealStrategy,
             DomainEntityManager domainManager, BeanFactory factory) {
         super(eventBus, view, proxy);
@@ -282,8 +285,8 @@ public class DataSourceMetricPresenter extends Presenter<DataSourceMetricPresent
     }
 
     public void verifyConnection(final String dsName, boolean isXA) {
-        
-        
+
+
         String subresource = isXA ? "xa-data-source": "data-source";
 
         ModelNode operation = new ModelNode();
@@ -307,26 +310,26 @@ public class DataSourceMetricPresenter extends Presenter<DataSourceMetricPresent
                     new ConnectionWindow(dsName, true).show();
                 }
             }
-        });        
-        
+        });
+
     }
 
     public void flush(final String dsName, boolean isXA) {
-        
-        
+
+
         String subresource = isXA ? "xa-data-source": "data-source";
-        
+
         ModelNode operation = new ModelNode();
         operation.get(ADDRESS).set(RuntimeBaseAddress.get());
         operation.get(ADDRESS).add("subsystem", "datasources");
         operation.get(ADDRESS).add(subresource, dsName);
         operation.get(OP).set("flush-all-connection-in-pool");
-        
+
         dispatcher.execute(new DMRAction(operation), new LoggingCallback<DMRResponse>() {
             @Override
             public void onSuccess(DMRResponse dmrResponse) {
                 ModelNode response = dmrResponse.get();
-                
+
                 if(response.isFailure())
                 {
                     Console.error(Console.MESSAGES.failed("Flush connections error for " + dsName), response.getFailureDescription());
@@ -336,7 +339,7 @@ public class DataSourceMetricPresenter extends Presenter<DataSourceMetricPresent
                     Console.info(Console.MESSAGES.successful("Flush connections for " + dsName));
                 }
             }
-        });        
-        
+        });
+
     }
 }

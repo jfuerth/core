@@ -19,6 +19,49 @@
 
 package org.jboss.as.console.client.shared.subsys.web;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.VALUE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.model.ModelAdapter;
+import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.web.model.HttpConnector;
+import org.jboss.as.console.client.shared.subsys.web.model.JSPContainerConfiguration;
+import org.jboss.as.console.client.shared.subsys.web.model.VirtualServer;
+import org.jboss.as.console.client.widgets.forms.AddressBinding;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.client.widgets.forms.PropertyBinding;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.Property;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
@@ -32,33 +75,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.model.ModelAdapter;
-import org.jboss.as.console.client.shared.subsys.Baseadress;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.web.model.HttpConnector;
-import org.jboss.as.console.client.shared.subsys.web.model.JSPContainerConfiguration;
-import org.jboss.as.console.client.shared.subsys.web.model.VirtualServer;
-import org.jboss.as.console.client.widgets.forms.AddressBinding;
-import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
-import org.jboss.as.console.client.widgets.forms.EntityAdapter;
-import org.jboss.as.console.client.widgets.forms.PropertyBinding;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-import org.jboss.dmr.client.Property;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -70,20 +86,20 @@ public class WebPresenter extends Presenter<WebPresenter.MyView, WebPresenter.My
     public static final String INSTANCE_ID_ATTRIBUTE = "instance-id";
 
     private final PlaceManager placeManager;
-    private BeanFactory factory;
-    private DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final DispatchAsync dispatcher;
 
     private DefaultWindow window;
-    private ApplicationMetaData metaData;
+    private final ApplicationMetaData metaData;
 
     private List<HttpConnector> connectors;
-    private RevealStrategy revealStrategy;
+    private final RevealStrategy revealStrategy;
 
     private List<VirtualServer> virtualServers;
 
-    private EntityAdapter<JSPContainerConfiguration> containerAdapter;
-    private LoadConnectorCmd loadConnectorCmd;
-    private LoadSocketBindingsCmd socketBinding;;
+    private final EntityAdapter<JSPContainerConfiguration> containerAdapter;
+    private final LoadConnectorCmd loadConnectorCmd;
+    private final LoadSocketBindingsCmd socketBinding;;
     private List<String> socketsBindingList;
 
     @ProxyCodeSplit
@@ -107,7 +123,7 @@ public class WebPresenter extends Presenter<WebPresenter.MyView, WebPresenter.My
     @Inject
     public WebPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,
+            @POC PlaceManager placeManager,
             BeanFactory factory, DispatchAsync dispatcher,
             ApplicationMetaData metaData,
             RevealStrategy revealStrategy) {

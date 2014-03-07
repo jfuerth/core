@@ -1,5 +1,38 @@
 package org.jboss.as.console.client.shared.subsys.ejb3;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.VALUE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.ejb3.model.EESubsystem;
+import org.jboss.as.console.client.shared.subsys.ejb3.model.Module;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.BeanMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -9,30 +42,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.subsys.Baseadress;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.ejb3.model.EESubsystem;
-import org.jboss.as.console.client.shared.subsys.ejb3.model.Module;
-import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
-import org.jboss.as.console.client.widgets.forms.BeanMetaData;
-import org.jboss.as.console.client.widgets.forms.EntityAdapter;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -42,12 +51,12 @@ public class EEPresenter extends Presenter<EEPresenter.MyView, EEPresenter.MyPro
 
     private final PlaceManager placeManager;
 
-    private RevealStrategy revealStrategy;
-    private ApplicationMetaData metaData;
-    private DispatchAsync dispatcher;
-    private EntityAdapter<EESubsystem> adapter;
-    private BeanMetaData beanMetaData;
-    private BeanFactory factory;
+    private final RevealStrategy revealStrategy;
+    private final ApplicationMetaData metaData;
+    private final DispatchAsync dispatcher;
+    private final EntityAdapter<EESubsystem> adapter;
+    private final BeanMetaData beanMetaData;
+    private final BeanFactory factory;
     private DefaultWindow window;
     private EESubsystem currentEntity;
 
@@ -68,7 +77,7 @@ public class EEPresenter extends Presenter<EEPresenter.MyView, EEPresenter.MyPro
     @Inject
     public EEPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, DispatchAsync dispatcher,
+            @POC PlaceManager placeManager, DispatchAsync dispatcher,
             RevealStrategy revealStrategy,
             ApplicationMetaData metaData, BeanFactory factory
     ) {

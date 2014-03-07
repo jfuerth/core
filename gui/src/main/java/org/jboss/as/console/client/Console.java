@@ -68,6 +68,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -76,7 +77,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 /**
  * Main application entry point. Executes several initialisation phases.
@@ -103,11 +103,28 @@ public class Console implements ReloadNotification.Handler {
     @Produces
     private final ApplicationMetaData applicationMetaData = GWT.create(ApplicationMetaData.class);
 
+    /**
+     * Temporarily public while we balance Errai IOC with GIN. Please don't make
+     * references to this field directly; instead, inject an EventBus using
+     * either Errai or GIN.
+     */
+    @Produces @POC
+    public
+    final com.google.gwt.event.shared.EventBus eventBus = new SimpleEventBus();
+
     @Inject
     private Workbench workbench;
 
+    /**
+     * Temporary reference to the Errai-created instance of this class. Remains
+     * null until the PostConstruct method has been invoked (by that time, all
+     * the injections have been resolved)
+     */
+    public static Console INSTANCE;
+
     @PostConstruct
     public void blockWorkbenchStartup() {
+        INSTANCE = this;
         MODULES = GWT.create(Composite.class);
         workbench.addStartupBlocker(Console.class);
         if (workbench == null) return;
@@ -229,7 +246,7 @@ public class Console implements ReloadNotification.Handler {
     private static void hideLoadingPanel() {
         RootPanel.get("loading-panel").removeFromParent();
     }
-    
+
     public static void info(String message) {
         getMessageCenter().notify(
                 new Message(message, Message.Severity.Info)
@@ -288,16 +305,12 @@ public class Console implements ReloadNotification.Handler {
     }
 
     public static EventBus getEventBus() {
-        return MODULES.getEventBus();
+        return INSTANCE.eventBus;
     }
 
     @Deprecated
     public static MessageCenter getMessageCenter() {
         return MODULES.getMessageCenter();
-    }
-
-    public static PlaceManager getPlaceManager() {
-        return MODULES.getPlaceManager();
     }
 
     public static BootstrapContext getBootstrapContext()

@@ -1,21 +1,31 @@
 package org.jboss.as.console.client.shared.subsys.jca;
 
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import com.gwtplatform.mvp.client.proxy.Proxy;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.VALUE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.model.ModelAdapter;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
@@ -45,13 +55,19 @@ import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.impl.DMRAction;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.Proxy;
 
 /**
  * @author Heiko Braun
@@ -61,24 +77,24 @@ public class ResourceAdapterPresenter
         extends Presenter<ResourceAdapterPresenter.MyView, ResourceAdapterPresenter.MyProxy> {
 
     private final PlaceManager placeManager;
-    private RevealStrategy revealStrategy;
-    private DispatchAsync dispatcher;
-    private BeanFactory factory;
+    private final RevealStrategy revealStrategy;
+    private final DispatchAsync dispatcher;
+    private final BeanFactory factory;
     private DefaultWindow window;
     private DefaultWindow propertyWindow;
 
-    private ApplicationMetaData metaData;
+    private final ApplicationMetaData metaData;
 
-    private BeanMetaData raMetaData;
-    private BeanMetaData connectionMetaData;
-    private BeanMetaData adminMetaData;
+    private final BeanMetaData raMetaData;
+    private final BeanMetaData connectionMetaData;
+    private final BeanMetaData adminMetaData;
     private String selectedAdapter;
 
-    private EntityAdapter<ConnectionDefinition> connectionAdapter;
-    private EntityAdapter<ResourceAdapter> adapter;
-    private EntityAdapter<PropertyRecord> propertyAdapter;
-    private EntityAdapter<PoolConfig> poolAdapter;
-    private EntityAdapter<AdminObject> adminAdapter;
+    private final EntityAdapter<ConnectionDefinition> connectionAdapter;
+    private final EntityAdapter<ResourceAdapter> adapter;
+    private final EntityAdapter<PropertyRecord> propertyAdapter;
+    private final EntityAdapter<PoolConfig> poolAdapter;
+    private final EntityAdapter<AdminObject> adminAdapter;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.ResourceAdapterPresenter)
@@ -98,7 +114,7 @@ public class ResourceAdapterPresenter
     @Inject
     public ResourceAdapterPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, RevealStrategy revealStrategy,
+            @POC PlaceManager placeManager, RevealStrategy revealStrategy,
             DispatchAsync dispatcher, BeanFactory factory, ApplicationMetaData propertyMetaData) {
         super(eventBus, view, proxy);
 

@@ -19,6 +19,23 @@
 
 package org.jboss.as.console.client.shared.general;
 
+import java.util.List;
+
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.general.model.Interface;
+import org.jboss.as.console.client.shared.general.model.LoadInterfacesCmd;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.BeanMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -28,21 +45,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.as.console.client.shared.general.model.Interface;
-import org.jboss.as.console.client.shared.general.model.LoadInterfacesCmd;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
-import org.jboss.as.console.client.widgets.forms.BeanMetaData;
-import org.jboss.as.console.client.widgets.forms.EntityAdapter;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-
-import java.util.List;
 
 /**
  * @author Heiko Braun
@@ -52,15 +54,15 @@ public class InterfacePresenter extends Presenter<InterfacePresenter.MyView, Int
     implements InterfaceManagement.Callback {
 
     private final PlaceManager placeManager;
-    private BeanFactory factory;
-    private DispatchAsync dispatcher;
-    private LoadInterfacesCmd loadInterfacesCmd;
-    private RevealStrategy revealStrategy;
+    private final BeanFactory factory;
+    private final DispatchAsync dispatcher;
+    private final LoadInterfacesCmd loadInterfacesCmd;
+    private final RevealStrategy revealStrategy;
     private DefaultWindow window;
-    private EntityAdapter<Interface> entityAdapter;
-    private BeanMetaData beanMetaData;
+    private final EntityAdapter<Interface> entityAdapter;
+    private final BeanMetaData beanMetaData;
 
-    private InterfaceManagement delegate;
+    private final InterfaceManagement delegate;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.InterfacePresenter)
@@ -79,7 +81,7 @@ public class InterfacePresenter extends Presenter<InterfacePresenter.MyView, Int
     @Inject
     public InterfacePresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,
+            @POC PlaceManager placeManager,
             DispatchAsync dispatcher,
             BeanFactory factory, RevealStrategy revealStrategy,
             ApplicationMetaData metaData) {
@@ -121,6 +123,7 @@ public class InterfacePresenter extends Presenter<InterfacePresenter.MyView, Int
         return modelNode;
     }
 
+    @Override
     public void loadInterfaces() {
 
         loadInterfacesCmd.execute(new SimpleCallback<List<Interface>>() {

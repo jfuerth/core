@@ -47,7 +47,7 @@ public class LoadMainApp implements Command {
     private final TokenFormatter formatter;
     private final BootstrapContext bootstrapContext;
 
-    public LoadMainApp(BootstrapContext bootstrapContext, PlaceManager placeManager, @POC TokenFormatter formatter) {
+    public LoadMainApp(BootstrapContext bootstrapContext, @POC PlaceManager placeManager, @POC TokenFormatter formatter) {
         this.bootstrapContext = bootstrapContext;
         this.placeManager = placeManager;
         this.formatter = formatter;

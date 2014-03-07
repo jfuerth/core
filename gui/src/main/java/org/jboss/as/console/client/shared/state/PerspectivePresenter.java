@@ -20,6 +20,7 @@ package org.jboss.as.console.client.shared.state;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.Header;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.UnauthorizedEvent;
 
 import com.google.web.bindery.event.shared.EventBus;
@@ -51,7 +52,7 @@ public abstract class PerspectivePresenter<V extends View, Proxy_ extends Proxy<
     private boolean hasBeenRevealed;
 
     public PerspectivePresenter(final EventBus eventBus, final V view, final Proxy_ proxy,
-            final PlaceManager placeManager, final Header header, final String token,
+            @POC final PlaceManager placeManager, final Header header, final String token,
             Object contentSlot) {
 
         super(eventBus, view, proxy);

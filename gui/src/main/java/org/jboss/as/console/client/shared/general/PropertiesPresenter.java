@@ -19,6 +19,30 @@
 
 package org.jboss.as.console.client.shared.general;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
+
+import java.util.List;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.properties.LoadPropertiesCmd;
+import org.jboss.as.console.client.shared.properties.NewPropertyWizard;
+import org.jboss.as.console.client.shared.properties.PropertyManagement;
+import org.jboss.as.console.client.shared.properties.PropertyRecord;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -31,25 +55,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.properties.LoadPropertiesCmd;
-import org.jboss.as.console.client.shared.properties.NewPropertyWizard;
-import org.jboss.as.console.client.shared.properties.PropertyManagement;
-import org.jboss.as.console.client.shared.properties.PropertyRecord;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-
-import java.util.List;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -59,11 +64,11 @@ public class PropertiesPresenter extends Presenter<PropertiesPresenter.MyView, P
         implements PropertyManagement {
 
     private final PlaceManager placeManager;
-    private BeanFactory factory;
-    private DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final DispatchAsync dispatcher;
     private DefaultWindow propertyWindow;
-    private LoadPropertiesCmd loadPropCmd;
-    private RevealStrategy revealStrategy;
+    private final LoadPropertiesCmd loadPropCmd;
+    private final RevealStrategy revealStrategy;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.PropertiesPresenter)
@@ -81,7 +86,7 @@ public class PropertiesPresenter extends Presenter<PropertiesPresenter.MyView, P
     @Inject
     public PropertiesPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, DispatchAsync dispatcher,
+            @POC PlaceManager placeManager, DispatchAsync dispatcher,
             BeanFactory factory, RevealStrategy revealStrategy) {
         super(eventBus, view, proxy);
 
@@ -125,10 +130,12 @@ public class PropertiesPresenter extends Presenter<PropertiesPresenter.MyView, P
         revealStrategy.revealInParent(this);
     }
 
+    @Override
     public void closePropertyDialoge() {
         propertyWindow.hide();
     }
 
+    @Override
     public void launchNewPropertyDialoge(String group) {
 
         propertyWindow = new DefaultWindow(Console.MESSAGES.createTitle("System Property"));
@@ -149,6 +156,7 @@ public class PropertiesPresenter extends Presenter<PropertiesPresenter.MyView, P
         propertyWindow.center();
     }
 
+    @Override
     public void onCreateProperty(final String groupName, final PropertyRecord prop)
     {
 
@@ -173,6 +181,7 @@ public class PropertiesPresenter extends Presenter<PropertiesPresenter.MyView, P
 
     }
 
+    @Override
     public void onDeleteProperty(final String groupName, final PropertyRecord prop)
     {
         ModelNode operation = new ModelNode();

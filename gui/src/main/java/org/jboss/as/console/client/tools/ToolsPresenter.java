@@ -1,5 +1,35 @@
 package org.jboss.as.console.client.tools;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_ATTRIBUTE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_NAMES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.rbac.AccessLogView;
+import org.jboss.as.console.client.rbac.StandardRole;
+import org.jboss.as.console.client.rbac.internal.RunAsRoleTool;
+import org.jboss.ballroom.client.widgets.forms.ResolveExpressionEvent;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.gwt.debugpanel.client.DebugPanel;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -18,28 +48,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.rbac.AccessLogView;
-import org.jboss.as.console.client.rbac.StandardRole;
-import org.jboss.as.console.client.rbac.internal.RunAsRoleTool;
-import org.jboss.ballroom.client.widgets.forms.ResolveExpressionEvent;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -51,7 +59,7 @@ public class ToolsPresenter extends Presenter<ToolsPresenter.MyView, ToolsPresen
     private final PlaceManager placeManager;
     private final DispatchAsync dispatcher;
     private final BootstrapContext context;
-    private BrowserPresenter browser;
+    private final BrowserPresenter browser;
 
     private String requestedTool;
     private DefaultWindow window;
@@ -74,7 +82,7 @@ public class ToolsPresenter extends Presenter<ToolsPresenter.MyView, ToolsPresen
     @Inject
     public ToolsPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, BrowserPresenter browser, DispatchAsync dispatcher, BootstrapContext context) {
+            @POC PlaceManager placeManager, BrowserPresenter browser, DispatchAsync dispatcher, BootstrapContext context) {
         super(eventBus, view, proxy);
         this.placeManager = placeManager;
         //this.debug = debug;

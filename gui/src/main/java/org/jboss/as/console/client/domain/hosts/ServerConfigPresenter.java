@@ -19,17 +19,24 @@
 
 package org.jboss.as.console.client.domain.hosts;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.INCLUDE_RUNTIME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.JVM;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.core.SuspendableView;
@@ -41,6 +48,7 @@ import org.jboss.as.console.client.domain.model.Server;
 import org.jboss.as.console.client.domain.model.ServerGroupRecord;
 import org.jboss.as.console.client.domain.model.ServerGroupStore;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.general.model.LoadSocketBindingsCmd;
 import org.jboss.as.console.client.shared.general.model.SocketBinding;
@@ -70,11 +78,17 @@ import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.dmr.client.dispatch.impl.DMRAction;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.Proxy;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  * @author Heiko Braun
@@ -84,19 +98,19 @@ public class ServerConfigPresenter extends Presenter<ServerConfigPresenter.MyVie
         implements  ServerWizardEvent.ServerWizardListener,
         JvmManagement, PropertyManagement, HostSelectionChanged.ChangeListener {
 
-    private HostInformationStore hostInfoStore;
-    private ServerGroupStore serverGroupStore;
+    private final HostInformationStore hostInfoStore;
+    private final ServerGroupStore serverGroupStore;
 
     private DefaultWindow window = null;
     private List<ServerGroupRecord> serverGroups;
 
     private DefaultWindow propertyWindow;
-    private DispatchAsync dispatcher;
-    private ApplicationMetaData propertyMetaData;
-    private BeanFactory factory;
-    private PlaceManager placeManager;
+    private final DispatchAsync dispatcher;
+    private final ApplicationMetaData propertyMetaData;
+    private final BeanFactory factory;
+    private final PlaceManager placeManager;
 
-    private LoadSocketBindingsCmd loadSocketCmd;
+    private final LoadSocketBindingsCmd loadSocketCmd;
     private final DomainEntityManager domainManager;
 
 
@@ -129,7 +143,7 @@ public class ServerConfigPresenter extends Presenter<ServerConfigPresenter.MyVie
             ServerGroupStore serverGroupStore,
             DispatchAsync dispatcher,
             ApplicationMetaData propertyMetaData, BeanFactory factory,
-            PlaceManager placeManager, DomainEntityManager domainManager) {
+            @POC PlaceManager placeManager, DomainEntityManager domainManager) {
         super(eventBus, view, proxy);
 
         this.hostInfoStore = hostInfoStore;

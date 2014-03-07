@@ -96,7 +96,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
 
     @Inject
     public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, BootstrapContext bootstrap,
-                  PlaceManager placeManager) {
+                  @POC PlaceManager placeManager) {
         this.messageBar = new MessageBar(messageCenter);
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;

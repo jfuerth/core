@@ -1,12 +1,18 @@
 package org.jboss.as.console.client;
 
+import java.lang.annotation.Annotation;
+
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.rbac.SecurityFramework;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.ballroom.client.rbac.SecurityService;
+import org.jboss.ballroom.client.spi.Framework;
+import org.jboss.errai.ioc.client.container.IOC;
+
 import com.google.gwt.core.client.GWT;
 import com.google.web.bindery.autobean.shared.AutoBeanFactory;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.ballroom.client.rbac.SecurityService;
-import org.jboss.ballroom.client.spi.Framework;
 
 /**
  * @author Heiko Braun
@@ -23,7 +29,13 @@ public class ConsoleFramework implements Framework {
 
     @Override
     public PlaceManager getPlaceManager() {
-        return Console.getPlaceManager();
+        return IOC.getBeanManager().lookupBean(PlaceManager.class, new POC() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return POC.class;
+            }
+        }).getInstance();
     }
 
     @Override
@@ -33,6 +45,6 @@ public class ConsoleFramework implements Framework {
 
     @Override
     public SecurityService getSecurityService() {
-        return Console.MODULES.getSecurityFramework();
+        return IOC.getBeanManager().lookupBean(SecurityFramework.class).getInstance();
     }
 }

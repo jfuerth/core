@@ -18,25 +18,16 @@
  */
 package org.jboss.as.console.client.core.gin;
 
-import java.lang.annotation.Annotation;
+import org.jboss.as.console.client.Console;
 
-import org.jboss.as.console.client.poc.POC;
-import org.jboss.errai.ioc.client.container.IOC;
-
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
-public class ErraiPlaceManagerProvider implements Provider<PlaceManager> {
+public class ErraiSimpleEventBusProvider implements Provider<EventBus> {
 
     @Override
-    public PlaceManager get() {
-        return IOC.getBeanManager().lookupBean(PlaceManager.class, new POC() {
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return POC.class;
-            }
-        }).getInstance();
+    public EventBus get() {
+        return Console.INSTANCE.eventBus;
     }
 
 }

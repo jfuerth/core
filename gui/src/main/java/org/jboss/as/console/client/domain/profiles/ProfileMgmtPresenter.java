@@ -19,7 +19,23 @@
 
 package org.jboss.as.console.client.domain.profiles;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.jboss.as.console.client.core.Header;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.core.SuspendableView;
+import org.jboss.as.console.client.domain.events.ProfileSelectionEvent;
+import org.jboss.as.console.client.domain.model.ProfileRecord;
+import org.jboss.as.console.client.domain.model.ProfileStore;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.SubsystemMetaData;
+import org.jboss.as.console.client.shared.model.SubsystemRecord;
+import org.jboss.as.console.client.shared.model.SubsystemStore;
+import org.jboss.as.console.client.shared.state.PerspectivePresenter;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.Scheduler;
@@ -34,24 +50,7 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import java.util.Collections;
-import org.jboss.as.console.client.core.Header;
-import org.jboss.as.console.client.core.MainLayoutPresenter;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.core.SuspendableView;
-import org.jboss.as.console.client.domain.events.ProfileSelectionEvent;
-import org.jboss.as.console.client.domain.model.ProfileRecord;
-import org.jboss.as.console.client.domain.model.ProfileStore;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
-import org.jboss.as.console.client.shared.SubsystemMetaData;
-import org.jboss.as.console.client.shared.model.SubsystemRecord;
-import org.jboss.as.console.client.shared.model.SubsystemStore;
-import org.jboss.as.console.client.shared.state.PerspectivePresenter;
-import org.jboss.errai.ioc.client.container.IOC;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -75,18 +74,17 @@ public class ProfileMgmtPresenter
     public static final GwtEvent.Type<RevealContentHandler<?>> TYPE_MainContent =
             new GwtEvent.Type<RevealContentHandler<?>>();
 
-    private SubsystemStore subsysStore;
+    private final SubsystemStore subsysStore;
     private final PlaceManager placeManager;
-    private ProfileStore profileStore;
-    private CurrentProfileSelection profileSelection;
+    private final ProfileStore profileStore;
+    private final CurrentProfileSelection profileSelection;
 
     @Inject
-    public ProfileMgmtPresenter(EventBus eventBus, MyView view, MyProxy proxy, PlaceManager placeManager,
+    public ProfileMgmtPresenter(EventBus eventBus, MyView view, MyProxy proxy, @POC PlaceManager placeManager,
             ProfileStore profileStore, SubsystemStore subsysStore, CurrentProfileSelection currentProfileSelection,
-            Header header, UnauthorisedPresenter unauthorisedPresenter) {
+            Header header) {
 
-        super(eventBus, view, proxy, placeManager, header, NameTokens.ProfileMgmtPresenter, unauthorisedPresenter,
-                TYPE_MainContent);
+        super(eventBus, view, proxy, placeManager, header, NameTokens.ProfileMgmtPresenter, TYPE_MainContent);
 
         this.placeManager = placeManager;
         this.profileStore = profileStore;

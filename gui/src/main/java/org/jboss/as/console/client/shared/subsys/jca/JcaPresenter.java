@@ -1,23 +1,27 @@
 package org.jboss.as.console.client.shared.subsys.jca;
 
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import com.gwtplatform.mvp.client.proxy.Proxy;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.CHILD_TYPE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.layout.ModalWindowLayout;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.properties.CreatePropertyCmd;
 import org.jboss.as.console.client.shared.properties.DeletePropertyCmd;
 import org.jboss.as.console.client.shared.properties.NewPropertyWizard;
@@ -30,19 +34,27 @@ import org.jboss.as.console.client.shared.subsys.jca.model.JcaBootstrapContext;
 import org.jboss.as.console.client.shared.subsys.jca.model.JcaConnectionManager;
 import org.jboss.as.console.client.shared.subsys.jca.model.JcaWorkmanager;
 import org.jboss.as.console.client.shared.subsys.jca.model.WorkmanagerPool;
-import org.jboss.as.console.client.layout.ModalWindowLayout;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.Property;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.Proxy;
 
 /**
  * @author Heiko Braun
@@ -53,24 +65,24 @@ public class JcaPresenter extends Presenter<JcaPresenter.MyView, JcaPresenter.My
 
     private final PlaceManager placeManager;
 
-    private RevealStrategy revealStrategy;
-    private ApplicationMetaData metaData;
-    private DispatchAsync dispatcher;
+    private final RevealStrategy revealStrategy;
+    private final ApplicationMetaData metaData;
+    private final DispatchAsync dispatcher;
 
-    private BeanMetaData beanMetaData;
-    private BeanFactory factory;
+    private final BeanMetaData beanMetaData;
+    private final BeanFactory factory;
 
-    private EntityAdapter<JcaBootstrapContext> boostrapAdapter;
-    private EntityAdapter<JcaBeanValidation> beanAdapter;
-    private EntityAdapter<JcaArchiveValidation> archiveAdapter;
-    private EntityAdapter<JcaConnectionManager> ccmAdapter;
-    private EntityAdapter<JcaWorkmanager> managerAdapter;
+    private final EntityAdapter<JcaBootstrapContext> boostrapAdapter;
+    private final EntityAdapter<JcaBeanValidation> beanAdapter;
+    private final EntityAdapter<JcaArchiveValidation> archiveAdapter;
+    private final EntityAdapter<JcaConnectionManager> ccmAdapter;
+    private final EntityAdapter<JcaWorkmanager> managerAdapter;
 
-    private LoadWorkmanagerCmd loadWorkManager;
+    private final LoadWorkmanagerCmd loadWorkManager;
     private DefaultWindow window;
     private DefaultWindow propertyWindow;
     private List<JcaWorkmanager> managers;
-    private EntityAdapter<WorkmanagerPool> poolAdapter;
+    private final EntityAdapter<WorkmanagerPool> poolAdapter;
     private String selectedWorkmanager;
 
     @ProxyCodeSplit
@@ -100,7 +112,7 @@ public class JcaPresenter extends Presenter<JcaPresenter.MyView, JcaPresenter.My
     @Inject
     public JcaPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,
+            @POC PlaceManager placeManager,
             DispatchAsync dispatcher,
             RevealStrategy revealStrategy,
             ApplicationMetaData metaData, BeanFactory factory) {
@@ -518,10 +530,12 @@ public class JcaPresenter extends Presenter<JcaPresenter.MyView, JcaPresenter.My
 
     // work manager
 
-     public void closePropertyDialoge() {
+     @Override
+    public void closePropertyDialoge() {
         propertyWindow.hide();
     }
 
+    @Override
     public void launchNewPropertyDialoge(String reference) {
 
         propertyWindow = new DefaultWindow(Console.MESSAGES.createTitle("Pool Property"));
@@ -536,6 +550,7 @@ public class JcaPresenter extends Presenter<JcaPresenter.MyView, JcaPresenter.My
         propertyWindow.center();
     }
 
+    @Override
     public void onCreateProperty(final String poolName, final PropertyRecord prop)
     {
         if(propertyWindow!=null && propertyWindow.isShowing())
@@ -561,6 +576,7 @@ public class JcaPresenter extends Presenter<JcaPresenter.MyView, JcaPresenter.My
         });
     }
 
+    @Override
     public void onDeleteProperty(final String poolName, final PropertyRecord prop)
     {
         String[] tokens = poolName.split("/");

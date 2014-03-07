@@ -20,6 +20,10 @@
 package org.jboss.as.console.client.auth;
 
 
+import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.poc.POC;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -41,8 +45,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
-import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.NameTokens;
 
 
 public class SignInPagePresenter extends
@@ -50,8 +52,8 @@ public class SignInPagePresenter extends
         SignInPageUIHandlers {
 
     private final PlaceManager placeManager;
-    private CurrentUser user;
-    private BootstrapContext bootstrap;
+    private final CurrentUser user;
+    private final BootstrapContext bootstrap;
 
     // private final ErrorDialogPresenterWidget errorDialog;
 
@@ -75,7 +77,7 @@ public class SignInPagePresenter extends
     @Inject
     public SignInPagePresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, CurrentUser user,
+            @POC PlaceManager placeManager, CurrentUser user,
             BootstrapContext bootstrap) {
         super(eventBus, view, proxy);
 
@@ -97,6 +99,7 @@ public class SignInPagePresenter extends
 
         final KeyDownHandler handler = new KeyDownHandler()
         {
+            @Override
             public void onKeyDown(KeyDownEvent event)
             {
                 if (KeyCodes.KEY_ENTER == event.getNativeKeyCode())

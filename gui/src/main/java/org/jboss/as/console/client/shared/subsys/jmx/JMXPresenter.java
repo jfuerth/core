@@ -1,23 +1,23 @@
 package org.jboss.as.console.client.shared.subsys.jmx;
 
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.Proxy;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.VALUE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.general.SimpleSuggestion;
 import org.jboss.as.console.client.shared.general.SuggestionManagement;
 import org.jboss.as.console.client.shared.general.model.LoadSocketBindingsCmd;
@@ -28,14 +28,23 @@ import org.jboss.as.console.client.shared.subsys.jmx.model.JMXSubsystem;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.Property;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.Proxy;
 
 /**
  * @author Heiko Braun
@@ -46,12 +55,12 @@ public class JMXPresenter extends Presenter<JMXPresenter.MyView, JMXPresenter.My
 
     private final PlaceManager placeManager;
 
-    private RevealStrategy revealStrategy;
-    private ApplicationMetaData metaData;
-    private DispatchAsync dispatcher;
-    private EntityAdapter<JMXSubsystem> adapter;
-    private BeanMetaData beanMetaData;
-    private BeanFactory factory;
+    private final RevealStrategy revealStrategy;
+    private final ApplicationMetaData metaData;
+    private final DispatchAsync dispatcher;
+    private final EntityAdapter<JMXSubsystem> adapter;
+    private final BeanMetaData beanMetaData;
+    private final BeanFactory factory;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.JMXPresenter)
@@ -69,7 +78,7 @@ public class JMXPresenter extends Presenter<JMXPresenter.MyView, JMXPresenter.My
     @Inject
     public JMXPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,
+            @POC PlaceManager placeManager,
             DispatchAsync dispatcher,
             RevealStrategy revealStrategy,
             ApplicationMetaData metaData, BeanFactory factory) {

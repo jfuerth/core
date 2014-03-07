@@ -36,7 +36,6 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.as.console.client.rbac.ResourceAccessLog;
@@ -82,19 +81,10 @@ public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
 
     private static long idCounter = 0;
 
-    private RequestBuilder postRequestBuilder;
     private final Diagnostics diagnostics = GWT.create(Diagnostics.class);
     private final boolean trackInvocations = diagnostics.isEnabled();
     private final DMREndpointConfig endpointConfig = GWT.create(DMREndpointConfig.class);
     private final ResourceAccessLog resourceLog = ResourceAccessLog.INSTANCE;
-
-    @PostConstruct
-    private void init() {
-        postRequestBuilder = new RequestBuilder(RequestBuilder.POST, endpointConfig.getUrl());
-        postRequestBuilder.setHeader(HEADER_ACCEPT, DMR_ENCODED);
-        postRequestBuilder.setHeader(HEADER_CONTENT_TYPE, DMR_ENCODED);
-        postRequestBuilder.setIncludeCredentials(true);
-    }
 
     private static native void redirect(String url)/*-{
         $wnd.location = url;
@@ -332,10 +322,18 @@ public class DMRHandler implements ActionHandler<DMRAction, DMRResponse> {
         }
         else
         {
-            requestBuilder = postRequestBuilder;
+            requestBuilder = makePostRequestBuilder();
             requestBuilder.setRequestData(operation.toBase64String());
         }
         return requestBuilder;
+    }
+
+    private RequestBuilder makePostRequestBuilder() {
+        RequestBuilder postRequestBuilder = new RequestBuilder(RequestBuilder.POST, endpointConfig.getUrl());
+        postRequestBuilder.setHeader(HEADER_ACCEPT, DMR_ENCODED);
+        postRequestBuilder.setHeader(HEADER_CONTENT_TYPE, DMR_ENCODED);
+        postRequestBuilder.setIncludeCredentials(true);
+        return postRequestBuilder;
     }
 
     private String descriptionOperationToUrl(final ModelNode operation)

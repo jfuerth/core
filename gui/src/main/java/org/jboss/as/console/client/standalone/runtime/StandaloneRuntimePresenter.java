@@ -1,6 +1,18 @@
 package org.jboss.as.console.client.standalone.runtime;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.jboss.as.console.client.core.Header;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.rbac.UnauthorizedEvent;
+import org.jboss.as.console.client.shared.model.SubsystemRecord;
+import org.jboss.as.console.client.shared.model.SubsystemStore;
+import org.jboss.as.console.client.shared.state.PerspectivePresenter;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.inject.Inject;
@@ -14,20 +26,7 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import java.util.Collections;
-import org.jboss.as.console.client.core.Header;
-import org.jboss.as.console.client.core.MainLayoutPresenter;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
-import org.jboss.as.console.client.rbac.UnauthorizedEvent;
-import org.jboss.as.console.client.shared.model.SubsystemRecord;
-import org.jboss.as.console.client.shared.model.SubsystemStore;
-import org.jboss.as.console.client.shared.state.PerspectivePresenter;
-import org.jboss.errai.ioc.client.container.IOC;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
 
 /**
  * @author Heiko Braun
@@ -51,11 +50,10 @@ public class StandaloneRuntimePresenter
     private final SubsystemStore subsysStore;
 
     @Inject
-    public StandaloneRuntimePresenter(EventBus eventBus, MyView view, MyProxy proxy, PlaceManager placeManager,
-            SubsystemStore subsysStore, Header header, UnauthorisedPresenter unauthorisedPresenter) {
+    public StandaloneRuntimePresenter(EventBus eventBus, MyView view, MyProxy proxy, @POC PlaceManager placeManager,
+            SubsystemStore subsysStore, Header header) {
 
-        super(eventBus, view, proxy, placeManager, header, NameTokens.StandaloneRuntimePresenter, unauthorisedPresenter,
-                TYPE_MainContent);
+        super(eventBus, view, proxy, placeManager, header, NameTokens.StandaloneRuntimePresenter, TYPE_MainContent);
 
         this.subsysStore = subsysStore;
     }

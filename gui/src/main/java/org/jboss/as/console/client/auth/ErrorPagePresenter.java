@@ -19,6 +19,9 @@
 
 package org.jboss.as.console.client.auth;
 
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.poc.POC;
+
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -30,7 +33,6 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
-import org.jboss.as.console.client.core.NameTokens;
 
 /**
  * @author Heiko Braun
@@ -54,7 +56,7 @@ public class ErrorPagePresenter extends
 
     @Inject
     public ErrorPagePresenter(EventBus eventBus, MyView view, MyProxy proxy,
-                              PlaceManager placeManager) {
+                              @POC PlaceManager placeManager) {
         super(eventBus, view, proxy);
         this.placeManager = placeManager;
     }

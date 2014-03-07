@@ -1,5 +1,35 @@
 package org.jboss.as.console.client.standalone;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.INCLUDE_RUNTIME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_ATTRIBUTE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+
+import java.util.List;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.runtime.ext.Extension;
+import org.jboss.as.console.client.shared.runtime.ext.ExtensionManager;
+import org.jboss.as.console.client.shared.runtime.ext.LoadExtensionCmd;
+import org.jboss.as.console.client.shared.schedule.LongRunningTask;
+import org.jboss.as.console.client.shared.state.ReloadEvent;
+import org.jboss.as.console.client.shared.state.ReloadState;
+import org.jboss.as.console.client.standalone.runtime.StandaloneRuntimePresenter;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.AsyncCommand;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -16,33 +46,6 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.BootstrapContext;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.client.shared.runtime.ext.Extension;
-import org.jboss.as.console.client.shared.runtime.ext.ExtensionManager;
-import org.jboss.as.console.client.shared.runtime.ext.LoadExtensionCmd;
-import org.jboss.as.console.client.shared.schedule.LongRunningTask;
-import org.jboss.as.console.client.shared.state.ReloadEvent;
-import org.jboss.as.console.client.shared.state.ReloadState;
-import org.jboss.as.console.client.standalone.runtime.StandaloneRuntimePresenter;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-import org.jboss.dmr.client.dispatch.AsyncCommand;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.gwt.flow.client.Async;
-import org.jboss.gwt.flow.client.Control;
-import org.jboss.gwt.flow.client.Function;
-import org.jboss.gwt.flow.client.Outcome;
-import org.jboss.gwt.flow.client.Precondition;
-
-import java.util.List;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Heiko Braun
@@ -51,11 +54,11 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 public class StandaloneServerPresenter extends Presenter<StandaloneServerPresenter.MyView, StandaloneServerPresenter.MyProxy> implements ExtensionManager {
 
     private final PlaceManager placeManager;
-    private DispatchAsync dispatcher;
-    private BeanFactory factory;
-    private ReloadState reloadState;
-    private BootstrapContext bootstrap;
-    private LoadExtensionCmd loadExtensionCmd;
+    private final DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final ReloadState reloadState;
+    private final BootstrapContext bootstrap;
+    private final LoadExtensionCmd loadExtensionCmd;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.StandaloneServerPresenter)
@@ -73,7 +76,7 @@ public class StandaloneServerPresenter extends Presenter<StandaloneServerPresent
     @Inject
     public StandaloneServerPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, DispatchAsync dispatcher, BeanFactory factory,
+            @POC PlaceManager placeManager, DispatchAsync dispatcher, BeanFactory factory,
             ReloadState reloadState, BootstrapContext bootstrap) {
         super(eventBus, view, proxy);
 
@@ -238,6 +241,7 @@ public class StandaloneServerPresenter extends Presenter<StandaloneServerPresent
         });
     }
 
+    @Override
     public void onDumpVersions() {
 
         loadExtensionCmd.dumpVersions(new SimpleCallback<String>() {

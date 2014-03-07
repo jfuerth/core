@@ -1,5 +1,16 @@
 package org.jboss.as.console.client.shared.runtime.ws;
 
+import java.util.List;
+
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.LoggingCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.ws.EndpointRegistry;
+import org.jboss.as.console.client.shared.subsys.ws.model.WebServiceEndpoint;
+import org.jboss.as.console.spi.AccessControl;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.Scheduler;
 import com.google.inject.Inject;
@@ -11,15 +22,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.LoggingCallback;
-import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.ws.EndpointRegistry;
-import org.jboss.as.console.client.shared.subsys.ws.model.WebServiceEndpoint;
-import org.jboss.as.console.spi.AccessControl;
-
-import java.util.List;
 
 /**
  * @author Heiko Braun
@@ -29,8 +31,8 @@ public class WebServiceRuntimePresenter
         extends Presenter<WebServiceRuntimePresenter.MyView, WebServiceRuntimePresenter.MyProxy>
         implements ServerSelectionChanged.ChangeListener {
 
-    private EndpointRegistry endpointRegistry;
-    private RevealStrategy revealStrategy;
+    private final EndpointRegistry endpointRegistry;
+    private final RevealStrategy revealStrategy;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.WebServiceRuntimePresenter)
@@ -49,7 +51,7 @@ public class WebServiceRuntimePresenter
     @Inject
     public WebServiceRuntimePresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, EndpointRegistry registry,
+            @POC PlaceManager placeManager, EndpointRegistry registry,
             RevealStrategy revealStrategy) {
         super(eventBus, view, proxy);
 

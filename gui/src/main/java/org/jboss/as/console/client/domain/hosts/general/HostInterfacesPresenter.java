@@ -19,19 +19,12 @@
 
 package org.jboss.as.console.client.domain.hosts.general;
 
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import java.util.List;
+
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.hosts.HostMgmtPresenter;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.general.InterfaceManagement;
 import org.jboss.as.console.client.shared.general.InterfaceManagementImpl;
@@ -45,7 +38,16 @@ import org.jboss.as.console.spi.AccessControl;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 
-import java.util.List;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
+import com.gwtplatform.mvp.client.proxy.Place;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.Proxy;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  * @author Heiko Braun
@@ -56,10 +58,10 @@ public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.M
 
     private final PlaceManager placeManager;
     private LoadInterfacesCmd loadInterfacesCmd;
-    private DispatchAsync dispatcher;
-    private BeanFactory factory;
-    private ApplicationMetaData metaData;
-    private InterfaceManagement delegate;
+    private final DispatchAsync dispatcher;
+    private final BeanFactory factory;
+    private final ApplicationMetaData metaData;
+    private final InterfaceManagement delegate;
     private final DomainEntityManager domainManager;
 
     @ProxyCodeSplit
@@ -80,7 +82,7 @@ public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.M
     @Inject
     public HostInterfacesPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager, DomainEntityManager domainManager,
+            @POC PlaceManager placeManager, DomainEntityManager domainManager,
             DispatchAsync dispatcher, BeanFactory factory, ApplicationMetaData metaData
     ) {
         super(eventBus, view, proxy);
@@ -130,6 +132,7 @@ public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.M
         return address;
     }
 
+    @Override
     public void loadInterfaces() {
 
         ModelNode address = new ModelNode();

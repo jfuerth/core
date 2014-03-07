@@ -65,7 +65,7 @@ public class Footer implements org.uberfire.client.workbench.Footer {
     private final Diagnostics diagnostics = GWT.create(Diagnostics.class);
 
     @Inject
-    public Footer(PlaceManager placeManager, @POC ProductConfig prodConfig, BootstrapContext context) {
+    public Footer(@POC PlaceManager placeManager, @POC ProductConfig prodConfig, BootstrapContext context) {
         this.placeManager = placeManager;
         this.productConfig = prodConfig;
         this.context = context;

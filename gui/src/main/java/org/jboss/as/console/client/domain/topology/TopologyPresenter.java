@@ -29,6 +29,28 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.Footer;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.core.SuspendableView;
+import org.jboss.as.console.client.domain.model.HostInformationStore;
+import org.jboss.as.console.client.domain.model.ServerGroupStore;
+import org.jboss.as.console.client.domain.model.ServerInstance;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.domain.model.impl.LifecycleOperation;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.flow.FunctionContext;
+import org.jboss.as.console.client.shared.runtime.ext.Extension;
+import org.jboss.as.console.client.shared.runtime.ext.ExtensionManager;
+import org.jboss.as.console.client.shared.runtime.ext.LoadExtensionCmd;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.gwt.flow.client.Async;
+import org.jboss.gwt.flow.client.Outcome;
+
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Random;
@@ -43,26 +65,6 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.Footer;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.core.SuspendableView;
-import org.jboss.as.console.client.domain.model.HostInformationStore;
-import org.jboss.as.console.client.domain.model.ServerGroupStore;
-import org.jboss.as.console.client.domain.model.ServerInstance;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.domain.model.impl.LifecycleOperation;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.client.shared.flow.FunctionContext;
-import org.jboss.as.console.client.shared.runtime.ext.Extension;
-import org.jboss.as.console.client.shared.runtime.ext.ExtensionManager;
-import org.jboss.as.console.client.shared.runtime.ext.LoadExtensionCmd;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.gwt.flow.client.Async;
-import org.jboss.gwt.flow.client.Outcome;
 
 public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, TopologyPresenter.MyProxy>
         implements ExtensionManager {
@@ -101,13 +103,13 @@ public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, Topol
     private final BeanFactory beanFactory;
     private final DispatchAsync dispatcher;
     private final Map<String, ServerGroup> serverGroups;
-    private LoadExtensionCmd loadExtensionCmd;
+    private final LoadExtensionCmd loadExtensionCmd;
     private boolean fake;
     private int hostIndex;
 
     @Inject
     public TopologyPresenter(final EventBus eventBus, final MyView view,
-            final MyProxy proxy, final RevealStrategy revealStrategy, final PlaceManager placeManager,
+            final MyProxy proxy, final RevealStrategy revealStrategy, final @POC PlaceManager placeManager,
             final HostInformationStore hostInfoStore, final ServerGroupStore serverGroupStore,
             final BeanFactory beanFactory, DispatchAsync dispatcher) {
         super(eventBus, view, proxy);
@@ -268,6 +270,7 @@ public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, Topol
         return hostInfos;
     }
 
+    @Override
     public void loadExtensions() {
         loadExtensionCmd.execute(new SimpleCallback<List<Extension>>() {
             @Override
@@ -277,6 +280,7 @@ public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, Topol
         });
     }
 
+    @Override
     public void onDumpVersions() {
 
         loadExtensionCmd.dumpVersions(new SimpleCallback<String>() {

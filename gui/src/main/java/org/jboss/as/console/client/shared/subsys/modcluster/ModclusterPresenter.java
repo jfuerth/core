@@ -1,5 +1,36 @@
 package org.jboss.as.console.client.shared.subsys.modcluster;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.NameTokens;
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.modcluster.model.Modcluster;
+import org.jboss.as.console.client.shared.subsys.modcluster.model.SSLConfig;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.BeanMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.as.console.spi.AccessControl;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
+
 import com.google.inject.Inject;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanUtils;
@@ -11,29 +42,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.core.NameTokens;
-import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.spi.AccessControl;
-import org.jboss.dmr.client.dispatch.DispatchAsync;
-import org.jboss.dmr.client.dispatch.impl.DMRAction;
-import org.jboss.dmr.client.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.subsys.Baseadress;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.modcluster.model.Modcluster;
-import org.jboss.as.console.client.shared.subsys.modcluster.model.SSLConfig;
-import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
-import org.jboss.as.console.client.widgets.forms.BeanMetaData;
-import org.jboss.as.console.client.widgets.forms.EntityAdapter;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.dmr.client.ModelNode;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * @author Pavel Slegr
@@ -44,14 +52,14 @@ public class ModclusterPresenter extends Presenter<ModclusterPresenter.MyView, M
         implements ModclusterManagement {
 
     private final PlaceManager placeManager;
-    private RevealStrategy revealStrategy;
-    private ApplicationMetaData metaData;
-    private DispatchAsync dispatcher;
-    private EntityAdapter<Modcluster> adapter;
-    private BeanMetaData beanMetaData;
+    private final RevealStrategy revealStrategy;
+    private final ApplicationMetaData metaData;
+    private final DispatchAsync dispatcher;
+    private final EntityAdapter<Modcluster> adapter;
+    private final BeanMetaData beanMetaData;
     private DefaultWindow window;
-    private EntityAdapter<SSLConfig> sslAdapter;
-    private BeanFactory factory;
+    private final EntityAdapter<SSLConfig> sslAdapter;
+    private final BeanFactory factory;
 
 
     @ProxyCodeSplit
@@ -70,7 +78,7 @@ public class ModclusterPresenter extends Presenter<ModclusterPresenter.MyView, M
     @Inject
     public ModclusterPresenter(
             EventBus eventBus, MyView view, MyProxy proxy,
-            PlaceManager placeManager,
+            @POC PlaceManager placeManager,
             DispatchAsync dispatcher,
             RevealStrategy revealStrategy,
             ApplicationMetaData metaData, BeanFactory factory) {
@@ -150,6 +158,7 @@ public class ModclusterPresenter extends Presenter<ModclusterPresenter.MyView, M
         revealStrategy.revealInParent(this);
     }
 
+    @Override
     public void onSave(final Modcluster editedEntity, Map<String, Object> changeset) {
 
         ModelNode address = new ModelNode();
