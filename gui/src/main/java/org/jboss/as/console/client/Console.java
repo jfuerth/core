@@ -43,12 +43,12 @@ import org.jboss.as.console.client.core.bootstrap.LoadMainApp;
 import org.jboss.as.console.client.core.bootstrap.RegisterSubsystems;
 import org.jboss.as.console.client.core.bootstrap.TrackExecutionMode;
 import org.jboss.as.console.client.core.gin.Composite;
+import org.jboss.as.console.client.core.gin.ErraiSimpleEventBusProvider;
 import org.jboss.as.console.client.core.message.Message;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
 import org.jboss.as.console.client.poc.POC;
-import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.Preferences;
 import org.jboss.as.console.client.shared.help.HelpSystem;
 import org.jboss.as.console.client.shared.state.ReloadNotification;
@@ -68,15 +68,15 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.TokenFormatter;
 
 /**
  * Main application entry point. Executes several initialisation phases.
@@ -94,26 +94,23 @@ public class Console implements ReloadNotification.Handler {
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
 
-    @Produces @POC
-    public final ProductConfig prodConfig = GWT.create(ProductConfig.class);
-
-    @Produces
-    private final BeanFactory beanFactory = GWT.create(BeanFactory.class);
-
     @Produces
     private final ApplicationMetaData applicationMetaData = GWT.create(ApplicationMetaData.class);
 
-    /**
-     * Temporarily public while we balance Errai IOC with GIN. Please don't make
-     * references to this field directly; instead, inject an EventBus using
-     * either Errai or GIN.
-     */
-    @Produces @POC
-    public
-    final com.google.gwt.event.shared.EventBus eventBus = new SimpleEventBus();
-
     @Inject
     private Workbench workbench;
+
+    @Inject @POC
+    private PlaceManager gwtpPlaceManager;
+
+    @Inject @POC
+    private TokenFormatter tokenFormatter;
+
+    @Inject
+    private BootstrapContext bootstrapContext;
+
+    @Inject @POC
+    private ProductConfig prodConfig;
 
     /**
      * Temporary reference to the Errai-created instance of this class. Remains
@@ -125,7 +122,6 @@ public class Console implements ReloadNotification.Handler {
     @PostConstruct
     public void blockWorkbenchStartup() {
         INSTANCE = this;
-        MODULES = GWT.create(Composite.class);
         workbench.addStartupBlocker(Console.class);
         if (workbench == null) return;
         Log.setUncaughtExceptionHandler();
@@ -139,7 +135,7 @@ public class Console implements ReloadNotification.Handler {
 
     public void onModuleLoad2() {
         // register global code split call handler
-        MODULES.getEventBus().addHandler(AsyncCallFailEvent.getType(), new AsyncCallHandler(MODULES.getPlaceManager()));
+        new ErraiSimpleEventBusProvider().get().addHandler(AsyncCallFailEvent.getType(), new AsyncCallHandler(gwtpPlaceManager));
 
         // load console css bundle
         ConsoleResources.INSTANCE.css().ensureInjected();
@@ -165,7 +161,7 @@ public class Console implements ReloadNotification.Handler {
 
             @Override
             public void onSuccess() {
-                DelayedBindRegistry.bind(MODULES);
+                //DelayedBindRegistry.bind(Assert.notNull(MODULES));
 
                 // dump prefs
                 for(Preferences.Key key : Preferences.Key.values())
@@ -213,15 +209,17 @@ public class Console implements ReloadNotification.Handler {
                         Notifications.addReloadHandler(Console.this);
 
                         new LoadMainApp(
-                                MODULES.getBootstrapContext(),
-                                MODULES.getPlaceManager(),
-                                MODULES.getTokenFormatter()).execute();
+                                bootstrapContext,
+                                gwtpPlaceManager,
+                                tokenFormatter).execute();
                     }
                 };
 
+                Console.MODULES = GWT.create(Composite.class);
+
                 // Ordered execution: if any of these fail, the interface wil not be loaded
                 new Async<BootstrapContext>().waterfall(
-                        MODULES.getBootstrapContext(), // shared context
+                        bootstrapContext, // shared context
                         bootstrapOutcome, // outcome
 
                         // bootstrap functions
@@ -304,8 +302,9 @@ public class Console implements ReloadNotification.Handler {
         });
     }
 
+    @Deprecated
     public static EventBus getEventBus() {
-        return INSTANCE.eventBus;
+        return new ErraiSimpleEventBusProvider().get();
     }
 
     @Deprecated
@@ -313,9 +312,10 @@ public class Console implements ReloadNotification.Handler {
         return MODULES.getMessageCenter();
     }
 
+    @Deprecated
     public static BootstrapContext getBootstrapContext()
     {
-        return MODULES.getBootstrapContext();
+        return INSTANCE.bootstrapContext;
     }
 
     @Deprecated

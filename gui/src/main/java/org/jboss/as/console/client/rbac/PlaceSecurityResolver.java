@@ -1,6 +1,6 @@
 package org.jboss.as.console.client.rbac;
 
-import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.core.gin.ErraiPlaceManagerProvider;
 
 /**
  * Resolves security context from place requests
@@ -11,6 +11,6 @@ import org.jboss.as.console.client.Console;
 public class PlaceSecurityResolver implements ContextKeyResolver {
     @Override
     public String resolveKey() {
-        return Console.MODULES.getPlaceManager().getCurrentPlaceRequest().getNameToken();
+        return new ErraiPlaceManagerProvider().get().getCurrentPlaceRequest().getNameToken();
     }
 }

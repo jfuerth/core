@@ -19,15 +19,19 @@
 
 package org.jboss.as.console.client.core.bootstrap;
 
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.dmr.client.ModelDescriptionConstants.NAME;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_ATTRIBUTE_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.STEPS;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.shared.Preferences;
@@ -39,14 +43,17 @@ import org.jboss.gwt.flow.client.Control;
 import org.jboss.gwt.flow.client.Function;
 import org.uberfire.client.workbench.Workbench;
 
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 /**
  * @author Heiko Braun
  * @date 5/19/11
  */
 public class ExecutionMode implements Function<BootstrapContext> {
 
-    private DispatchAsync dispatcher;
-    private Workbench workbench;
+    private final DispatchAsync dispatcher;
+    private final Workbench workbench;
 
     public ExecutionMode(DispatchAsync dispatcher, Workbench workbench) {
         this.dispatcher = dispatcher;

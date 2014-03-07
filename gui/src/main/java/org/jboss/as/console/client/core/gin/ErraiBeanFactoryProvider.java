@@ -21,26 +21,14 @@ package org.jboss.as.console.client.core.gin;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
-import org.jboss.as.console.client.poc.POC;
+import org.jboss.as.console.client.shared.BeanFactory;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.inject.Provider;
+import com.google.gwt.core.client.GWT;
 
 @ApplicationScoped
-public class ErraiSimpleEventBusProvider implements Provider<EventBus> {
+public class ErraiBeanFactoryProvider {
 
-    /**
-     * Temporarily public while we balance Errai IOC with GIN. Please don't make
-     * references to this field directly; instead, inject an EventBus using
-     * either Errai or GIN.
-     */
-    private static final com.google.gwt.event.shared.EventBus eventBus = new SimpleEventBus();
-
-    @Produces @POC
-    @Override
-    public EventBus get() {
-        return eventBus;
-    }
+    @Produces
+    private final BeanFactory beanFactory = GWT.create(BeanFactory.class);
 
 }

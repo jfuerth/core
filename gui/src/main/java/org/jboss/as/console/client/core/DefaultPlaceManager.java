@@ -55,10 +55,17 @@ public class DefaultPlaceManager extends PlaceManagerImpl {
     private final BootstrapContext bootstrap;
     private final EventBus eventBus;
 
+    private static Exception FIRST_CREATION;
     @Inject
     public DefaultPlaceManager(EventBus eventBus, @POC TokenFormatter tokenFormatter, BootstrapContext bootstrap,
             SecurityFramework securityManager) {
         super(eventBus, tokenFormatter);
+
+        if (FIRST_CREATION != null) {
+            throw new RuntimeException("A second instance of " + getClass() + " was created!", FIRST_CREATION);
+        }
+        FIRST_CREATION = new Exception("First instance created here");
+
         this.bootstrap = bootstrap;
         this.eventBus = eventBus;
         this.securityFramework = securityManager;
