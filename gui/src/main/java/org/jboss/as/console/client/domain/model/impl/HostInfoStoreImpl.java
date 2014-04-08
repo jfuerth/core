@@ -51,6 +51,7 @@ import org.jboss.as.console.client.domain.model.ServerFlag;
 import org.jboss.as.console.client.domain.model.ServerInstance;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.domain.topology.HostInfo;
+import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.jvm.Jvm;
 import org.jboss.as.console.client.shared.model.ModelAdapter;
@@ -86,7 +87,7 @@ public class HostInfoStoreImpl implements HostInformationStore {
     private final EntityAdapter<PropertyRecord> propertyAdapter;
 
     @Inject
-    public HostInfoStoreImpl(DispatchAsync dispatcher, BeanFactory factory, ApplicationMetaData propertyMeta) {
+    public HostInfoStoreImpl(DispatchAsync dispatcher, BeanFactory factory, @POC ApplicationMetaData propertyMeta) {
         this.dispatcher = dispatcher;
         this.factory = factory;
         this.propertyMetaData = propertyMeta;

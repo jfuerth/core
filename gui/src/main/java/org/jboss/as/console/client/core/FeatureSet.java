@@ -18,8 +18,10 @@
  */
 package org.jboss.as.console.client.core;
 
-import com.google.inject.Inject;
 import org.jboss.as.console.client.ProductConfig;
+import org.jboss.as.console.client.poc.POC;
+
+import com.google.inject.Inject;
 
 /**
  * Contains methods to check whether distinct features are enables. Whether a feature is enabled might depend on
@@ -32,7 +34,7 @@ public class FeatureSet {
     private final ProductConfig productConfig;
 
     @Inject
-    public FeatureSet(final ProductConfig productConfig) {this.productConfig = productConfig;}
+    public FeatureSet(final @POC ProductConfig productConfig) {this.productConfig = productConfig;}
 
     public boolean isSearchEnabled() {
         return productConfig.getProfile() == ProductConfig.Profile.COMMUNITY;

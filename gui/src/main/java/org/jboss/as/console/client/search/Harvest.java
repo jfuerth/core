@@ -1,13 +1,17 @@
 package org.jboss.as.console.client.search;
 
-import static org.jboss.dmr.client.ModelDescriptionConstants.*;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.dmr.client.ModelDescriptionConstants.DESCRIPTION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_RESOURCE_DESCRIPTION_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.Footer;
@@ -26,11 +30,14 @@ import org.jboss.gwt.flow.client.Outcome;
 import org.jboss.gwt.flow.client.Progress;
 import org.useware.kernel.gui.behaviour.FilteringStatementContext;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 /**
  * Creates search indexes.
  *
  * @author Heiko Braun
  */
+@ApplicationScoped
 public class Harvest {
 
     private final SearchIndexRegistry searchIndexRegistry;

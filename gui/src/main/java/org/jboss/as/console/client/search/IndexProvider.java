@@ -18,18 +18,23 @@
  */
 package org.jboss.as.console.client.search;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+
 import org.jboss.as.console.client.core.BootstrapContext;
 import org.jboss.as.console.client.core.settings.ModelVersions;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.Preferences;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * GIN provider which provides an index based on the locale and management version.
  *
  * @author Harald Pehl
  */
+@ApplicationScoped
 public class IndexProvider implements Provider<Index> {
 
     private final String prefix;
@@ -46,6 +51,7 @@ public class IndexProvider implements Provider<Index> {
                 .get("core-version") + "_";
     }
 
+    @Produces
     @Override
     public Index get() {
         return new Index(prefix, beanFactory);

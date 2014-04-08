@@ -19,9 +19,10 @@
 
 package org.jboss.as.console.client.poc;
 
-import com.google.gwt.core.client.GWT;
 import java.util.List;
-import javax.inject.Inject;
+
+import javax.enterprise.context.ApplicationScoped;
+
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityFactory;
@@ -29,11 +30,13 @@ import org.jboss.as.console.client.widgets.forms.FormMetaData;
 import org.jboss.as.console.client.widgets.forms.Mutator;
 import org.jboss.as.console.client.widgets.forms.PropertyBinding;
 
+import com.google.gwt.core.client.GWT;
+
 /**
  *
  * @author Stan Silvert ssilvert@redhat.com (C) 2014 Red Hat Inc.
  */
-@POC
+@ApplicationScoped @POC
 public class ApplicationMetaDataPOC implements ApplicationMetaData {
 
     private static final ApplicationMetaData generated = GWT.create(ApplicationMetaData.class); //new org.jboss.as.console.client.widgets.forms.ApplicationMetaDataImpl();
