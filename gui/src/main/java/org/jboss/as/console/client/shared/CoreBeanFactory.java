@@ -31,6 +31,7 @@ import org.jboss.as.console.client.domain.model.ProfileRecord;
 import org.jboss.as.console.client.domain.model.Server;
 import org.jboss.as.console.client.domain.model.ServerGroupRecord;
 import org.jboss.as.console.client.domain.model.ServerInstance;
+import org.jboss.as.console.client.search.Document;
 import org.jboss.as.console.client.shared.deployment.DeploymentReference;
 import org.jboss.as.console.client.shared.deployment.model.DeployedEjb;
 import org.jboss.as.console.client.shared.deployment.model.DeployedEndpoint;
@@ -53,6 +54,8 @@ import org.jboss.as.console.client.shared.jvm.model.OSMetric;
 import org.jboss.as.console.client.shared.jvm.model.RuntimeMetric;
 import org.jboss.as.console.client.shared.jvm.model.ThreadMetric;
 import org.jboss.as.console.client.shared.model.SubsystemRecord;
+import org.jboss.as.console.client.shared.patching.PatchInfo;
+import org.jboss.as.console.client.shared.patching.RollbackOptions;
 import org.jboss.as.console.client.shared.properties.PropertyRecord;
 import org.jboss.as.console.client.shared.properties.PropertyRecordCategory;
 import org.jboss.as.console.client.shared.runtime.ext.Extension;
@@ -172,6 +175,8 @@ public interface CoreBeanFactory {
     AutoBean<Server> server();
     AutoBean<Jvm> jvm();
     AutoBean<ServerInstance> serverInstance();
+    AutoBean<PatchInfo> patchInfo();
+    AutoBean<RollbackOptions> rollbackOptions();
 
     AutoBean<DataSource> dataSource();
     AutoBean<XADataSource> xaDataSource();
@@ -221,6 +226,7 @@ public interface CoreBeanFactory {
     AutoBean<MessagingProvider> messagingProvider();
     AutoBean<SecurityPattern> messagingSecurity();
     AutoBean<AddressingPattern> messagingAddress();
+    AutoBean<Document> indexDocument();
 
     AutoBean<HttpConnector> httpConnector();
     AutoBean<JSPContainerConfiguration> jspConfig();

@@ -1,0 +1,54 @@
+package org.jboss.as.console.client.plugins;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class SearchIndexRegistryImpl implements SearchIndexRegistry {
+
+    private final Map<String, SearchIndexMetaData> tokens;
+
+    public SearchIndexRegistryImpl() {
+        this.tokens = new HashMap<String, SearchIndexMetaData>();
+
+        String[] resources;
+        String[] keywords;
+
+        <#list metaData as md>
+            resources = new String[] {<#list md.getResources() as resource>"${resource}",</#list>};
+            keywords = new String[] {<#list md.getKeywords() as keyword>"${keyword}",</#list>};
+            tokens.put("${md.getToken()}", new SearchIndexMetaData("${md.getToken()}", ${md.isStandalone()?string("true", "false")}, ${md.isDomain()?string("true", "false")}, resources, keywords));
+        </#list>
+     }
+
+    @Override
+    public Set<String> getTokens(boolean standalone) {
+        Set<String> matchingTokens = new HashSet<String>();
+        for (SearchIndexMetaData metaData : tokens.values()) {
+            if ((standalone && metaData.isStandalone()) || (!standalone && metaData.isDomain())) {
+                matchingTokens.add(metaData.getToken());
+            }
+        }
+        return matchingTokens;
+    }
+
+    @Override
+    public Set<String> getResources(String token) {
+        SearchIndexMetaData metaData = tokens.get(token);
+        if (metaData != null) {
+            return metaData.getResources();
+        }
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getKeywords(String token) {
+        SearchIndexMetaData metaData = tokens.get(token);
+        if (metaData != null) {
+            return metaData.getKeywords();
+        }
+        return Collections.emptySet();
+    }
+}

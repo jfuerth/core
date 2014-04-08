@@ -19,13 +19,14 @@
 
 package org.jboss.as.console.client.domain.hosts.general;
 
+import static org.jboss.as.console.spi.OperationMode.Mode.DOMAIN;
+
 import java.util.List;
 
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.domain.hosts.HostMgmtPresenter;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.poc.POC;
-import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.rbac.PlaceRequestSecurityFramework;
 import org.jboss.as.console.client.shared.general.InterfaceManagement;
 import org.jboss.as.console.client.shared.general.InterfaceManagementImpl;
 import org.jboss.as.console.client.shared.general.model.Interface;
@@ -35,6 +36,7 @@ import org.jboss.as.console.client.shared.state.HostSelectionChanged;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityAdapter;
 import org.jboss.as.console.spi.AccessControl;
+import org.jboss.as.console.spi.OperationMode;
 import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 
@@ -45,7 +47,7 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -54,59 +56,47 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
  * @date 5/18/11
  */
 public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.MyView, HostInterfacesPresenter.MyProxy>
-    implements InterfaceManagement.Callback, HostSelectionChanged.ChangeListener {
-
-    private final PlaceManager placeManager;
-    private LoadInterfacesCmd loadInterfacesCmd;
-    private final DispatchAsync dispatcher;
-    private final BeanFactory factory;
-    private final ApplicationMetaData metaData;
-    private final InterfaceManagement delegate;
-    private final DomainEntityManager domainManager;
+        implements InterfaceManagement.Callback, HostSelectionChanged.ChangeListener {
 
     @ProxyCodeSplit
     @NameToken(NameTokens.HostInterfacesPresenter)
-    @AccessControl(resources = {
-            "/{selected.host}/interface=*",
-    })
-    public interface MyProxy extends Proxy<HostInterfacesPresenter>, Place {
-    }
+    @OperationMode(DOMAIN)
+    @AccessControl(resources = {"/{selected.host}/interface=*",})
+    public interface MyProxy extends Proxy<HostInterfacesPresenter>, Place {}
+
 
     public interface MyView extends View {
+
         void setPresenter(HostInterfacesPresenter presenter);
+
         void setInterfaces(List<Interface> interfaces);
 
         void setDelegate(InterfaceManagement delegate);
     }
 
+
+    private final DispatchAsync dispatcher;
+    private final ApplicationMetaData metaData;
+    private final PlaceRequestSecurityFramework placeRequestSecurityFramework;
+    private final InterfaceManagement delegate;
+    private final DomainEntityManager domainManager;
+
+
     @Inject
-    public HostInterfacesPresenter(
-            EventBus eventBus, MyView view, MyProxy proxy,
-            @POC PlaceManager placeManager, DomainEntityManager domainManager,
-            DispatchAsync dispatcher, BeanFactory factory, ApplicationMetaData metaData
-    ) {
+    public HostInterfacesPresenter(EventBus eventBus, MyView view, MyProxy proxy, DomainEntityManager domainManager,
+            DispatchAsync dispatcher, ApplicationMetaData metaData,
+            PlaceRequestSecurityFramework placeRequestSecurityFramework) {
+
         super(eventBus, view, proxy);
 
-        this.placeManager = placeManager;
+        this.domainManager = domainManager;
         this.dispatcher = dispatcher;
-        this.factory = factory;
-        this.domainManager= domainManager;
         this.metaData = metaData;
-
-        EntityAdapter<Interface> entityAdapter = new EntityAdapter<Interface>(Interface.class, metaData);
-
-        this.delegate = new InterfaceManagementImpl(
-                dispatcher,
-                entityAdapter,
+        this.placeRequestSecurityFramework = placeRequestSecurityFramework;
+        this.delegate = new InterfaceManagementImpl(dispatcher, new EntityAdapter<Interface>(Interface.class, metaData),
                 metaData.getBeanMetaData(Interface.class));
         this.delegate.setCallback(this);
 
-    }
-
-    @Override
-    public void onHostSelectionChanged() {
-        if(isVisible())
-            loadInterfaces();
     }
 
     @Override
@@ -115,13 +105,31 @@ public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.M
         getView().setPresenter(this);
         getView().setDelegate(this.delegate);
         getEventBus().addHandler(HostSelectionChanged.TYPE, this);
+        placeRequestSecurityFramework.addCurrentContext(hostPlaceRequest());
     }
 
+    @Override
+    protected void revealInParent() {
+        RevealContentEvent.fire(this, HostMgmtPresenter.TYPE_MainContent, this);
+    }
 
     @Override
     protected void onReset() {
         super.onReset();
         loadInterfaces();
+    }
+
+    @Override
+    public void onHostSelectionChanged() {
+        if (isVisible()) {
+            placeRequestSecurityFramework.update(this, hostPlaceRequest());
+            loadInterfaces();
+        }
+    }
+
+    private PlaceRequest hostPlaceRequest() {
+        return new PlaceRequest.Builder().nameToken(getProxy().getNameToken())
+                .with("host", domainManager.getSelectedHost()).build();
     }
 
     @Override
@@ -134,23 +142,15 @@ public class HostInterfacesPresenter extends Presenter<HostInterfacesPresenter.M
 
     @Override
     public void loadInterfaces() {
-
         ModelNode address = new ModelNode();
         address.add("host", domainManager.getSelectedHost());
 
         LoadInterfacesCmd loadInterfacesCmd = new LoadInterfacesCmd(dispatcher, address, metaData);
-
         loadInterfacesCmd.execute(new SimpleCallback<List<Interface>>() {
             @Override
             public void onSuccess(List<Interface> result) {
                 getView().setInterfaces(result);
             }
         });
-
-    }
-
-    @Override
-    protected void revealInParent() {
-        RevealContentEvent.fire(this, HostMgmtPresenter.TYPE_MainContent, this);
     }
 }

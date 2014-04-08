@@ -64,6 +64,7 @@ public class ToolsPresenter extends Presenter<ToolsPresenter.MyView, ToolsPresen
     private String requestedTool;
     private DefaultWindow window;
     private RunAsRoleTool runAsRoleTool;
+    private DefaultWindow indexWindow;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.ToolsPresenter)
@@ -246,5 +247,20 @@ public class ToolsPresenter extends Presenter<ToolsPresenter.MyView, ToolsPresen
                 }
             });
         }
+//        else if("indexing".equals(requestedTool))
+//        {
+//
+//            if(null== indexWindow)
+//            {
+//                indexWindow = new DefaultWindow("Search Index");
+//                indexWindow.setWidth(640);
+//                indexWindow.setHeight(480);
+//
+//                indexWindow.setWidget(new ScrollPanel(new SearchIndexView(indexWindow).asWidget()));
+//                indexWindow.setModal(true);
+//            }
+//
+//            indexWindow.center();
+//        }
     }
 }

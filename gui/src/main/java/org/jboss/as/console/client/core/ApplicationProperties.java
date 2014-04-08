@@ -28,6 +28,7 @@ public interface ApplicationProperties {
     String STANDALONE = "standalone_usage";
     String DOMAIN_API = "domain-api";
     String DEPLOYMENT_API = "add-content";
+    String PATCH_API = "management-upload";
     String LOGOUT_API = "logout";
 
     void setProperty(String key, String value);

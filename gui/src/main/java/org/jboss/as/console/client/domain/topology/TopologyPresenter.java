@@ -20,6 +20,7 @@ package org.jboss.as.console.client.domain.topology;
 
 import static org.jboss.as.console.client.domain.model.ServerFlag.RELOAD_REQUIRED;
 import static org.jboss.as.console.client.domain.model.ServerFlag.RESTART_REQUIRED;
+import static org.jboss.as.console.spi.OperationMode.Mode.DOMAIN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import org.jboss.as.console.client.shared.runtime.ext.ExtensionManager;
 import org.jboss.as.console.client.shared.runtime.ext.LoadExtensionCmd;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
 import org.jboss.as.console.spi.AccessControl;
+import org.jboss.as.console.spi.OperationMode;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.jboss.gwt.flow.client.Async;
@@ -77,8 +79,9 @@ public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, Topol
      */
     @ProxyCodeSplit
     @NameToken(NameTokens.Topology)
+    @OperationMode(DOMAIN)
     @AccessControl(resources = {
-            "/server-group={addressable.group}",
+            "/server-group=*",
             "/{selected.host}/server-config=*"
             //"/{selected.host}/server=*",  https://issues.jboss.org/browse/WFLY-1997
     }, recursive = false)
@@ -162,9 +165,7 @@ public class TopologyPresenter extends Presenter<TopologyPresenter.MyView, Topol
             Outcome<FunctionContext> outcome = new Outcome<FunctionContext>() {
                 @Override
                 public void onFailure(final FunctionContext context) {
-                    //noinspection ThrowableResultOfMethodCallIgnored
-                    String details = context.getError() != null ? context.getError().getMessage() : null;
-                    Console.error("Unable to load topology", details); // TODO i18n
+                    Console.error("Unable to load topology", context.getErrorMessage()); // TODO i18n
                 }
 
                 @Override

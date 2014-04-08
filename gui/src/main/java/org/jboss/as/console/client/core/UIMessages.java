@@ -212,4 +212,50 @@ public interface UIMessages extends Messages {
     String no_groups_header();
 
     String no_groups_warning();
+
+    String verify_datasource_successful_message(String datasource);
+
+    String verify_datasource_failed_message(String datasource);
+
+    String patch_manager_rollback_body(String id);
+
+    String patch_manager_stop_server_body(String host);
+
+    String patch_manager_applying(String filename);
+
+    String patch_manager_restart_yes(String serverOrHost);
+
+    SafeHtml patch_manager_conflict_override_title();
+
+    SafeHtml patch_manager_desc_product();
+
+    String patch_manager_applying_patch_body(String filename);
+
+    String patch_manager_restart_needed(String serverOrHost);
+
+    String patch_manager_error_parse_result(String exception, String payload);
+
+    String patch_manager_rolling_back_body(String id);
+
+    SafeHtml content_box_create_datasource_body_standalone();
+
+    SafeHtml content_box_create_datasource_body_domain();
+
+    SafeHtml content_box_new_deployment_body_standalone();
+
+    SafeHtml content_box_new_deployment_body_domain();
+
+    SafeHtml content_box_apply_patch_body_standalone();
+
+    SafeHtml content_box_apply_patch_body_domain();
+
+    SafeHtml content_box_role_assignment_body();
+
+    SafeHtml content_box_create_server_group_body();
+
+    SafeHtml content_box_topology_body();
+
+    SafeHtml search_index_pending();
+
+    String patch_manager_restart_verify(String host);
 }

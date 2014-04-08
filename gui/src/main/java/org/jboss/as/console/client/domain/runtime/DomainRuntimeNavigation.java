@@ -1,5 +1,8 @@
 package org.jboss.as.console.client.domain.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -17,9 +20,6 @@ import org.jboss.as.console.client.widgets.tree.GroupItem;
 import org.jboss.ballroom.client.layout.LHSNavTree;
 import org.jboss.ballroom.client.layout.LHSNavTreeItem;
 import org.jboss.ballroom.client.layout.LHSTreeSection;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Heiko Braun

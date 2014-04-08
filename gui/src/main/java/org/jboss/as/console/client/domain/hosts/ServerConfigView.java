@@ -19,6 +19,8 @@
 
 package org.jboss.as.console.client.domain.hosts;
 
+import java.util.List;
+
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -32,6 +34,7 @@ import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.SuspendableViewImpl;
 import org.jboss.as.console.client.domain.model.Server;
 import org.jboss.as.console.client.domain.model.ServerGroupRecord;
+import org.jboss.as.console.client.layout.MultipleToOneLayout;
 import org.jboss.as.console.client.shared.general.model.SocketBinding;
 import org.jboss.as.console.client.shared.help.FormHelpPanel;
 import org.jboss.as.console.client.shared.jvm.Jvm;
@@ -39,20 +42,17 @@ import org.jboss.as.console.client.shared.jvm.JvmEditor;
 import org.jboss.as.console.client.shared.properties.PropertyEditor;
 import org.jboss.as.console.client.shared.properties.PropertyRecord;
 import org.jboss.as.console.client.shared.state.ServerConfigList;
-import org.jboss.as.console.client.layout.MultipleToOneLayout;
 import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
 
-import java.util.List;
-
 /**
  * @author Heiko Braun
  * @date 3/3/11
  */
-public class ServerConfigView extends SuspendableViewImpl implements ServerConfigPresenter.MyView{
+public class ServerConfigView extends SuspendableViewImpl implements ServerConfigPresenter.MyView {
 
     private ServerConfigPresenter presenter;
 
@@ -64,6 +64,7 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
     private DefaultCellTable<Server> serverConfigTable;
     private ListDataProvider serverConfigProvider;
     private String preselection;
+
 
     public ServerConfigView() {
         serverConfigTable = new DefaultCellTable<Server>(8, new ProvidesKey<Server>() {
@@ -92,6 +93,7 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
                 presenter.launchNewConfigDialoge();
             }
         });
+        addBtn.setOperationAddress("/{selected.host}/server-config=*", "add");
         addBtn.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_add_serverConfigView());
         toolStrip.addToolButtonRight(addBtn);
 
@@ -114,7 +116,7 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
                         });
             }
         });
-
+        deleteBtn.setOperationAddress("/{selected.host}/server-config=*", "remove");
         deleteBtn.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_delete_serverConfigView());
         toolStrip.addToolButtonRight(deleteBtn);
 
@@ -128,8 +130,10 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
                 presenter.onLaunchCopyWizard(server);
             }
         });
+        copyBtn.setOperationAddress("/{selected.host}/server-config=*", "add");
 
         toolStrip.addToolButtonRight(copyBtn);
+        toolStrip.setFilter("/{selected.host}/server-config=*");
 
         // ------------------------------------------------------
 
@@ -181,7 +185,7 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
         });
 
         propertyEditor = new PropertyEditor(presenter, true);
-        propertyEditor.setOperationAddress("/{selected.host}/server-config=*/system-property=*", "add");
+//        propertyEditor.setOperationAddress("/{selected.host}/server-config=*/system-property=*", "add");
 
         portsView = new PortsView();
 
@@ -198,6 +202,11 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
                 .addDetail("Attributes", details.asWidget())
                 .addDetail(Console.CONSTANTS.common_label_virtualMachine(), jvmEditor.asWidget())
                 .addDetail(Console.CONSTANTS.common_label_systemProperties(), propertyEditor.asWidget());
+        // 1. Filter must be set *after* jvmEditor.asWidget()
+        // 2. We don't get exceptions for nested resources like "/{selected.host}/server-config=*/jvm=*",
+        // so we use the parent address assuming that the privileges are the same - i.e. if we cannot modify the
+        // server-config, we shouldn't be able to edit the JVM settings either.
+        jvmEditor.setSecurityContextFilter("/{selected.host}/server-config=*");
 
 
         details.bind(serverConfigTable);
@@ -206,19 +215,16 @@ public class ServerConfigView extends SuspendableViewImpl implements ServerConfi
                 new SelectionChangeEvent.Handler() {
                     @Override
                     public void onSelectionChange(SelectionChangeEvent selectionChangeEvent) {
-                        Server server = getSelectionModel().getSelectedObject();
-                        presenter.loadJVMConfiguration(server);
-                        presenter.loadProperties(server);
-                        presenter.loadPorts(server);
+                        presenter.onServerConfigSelectionChanged(getSelectionModel().getSelectedObject());
                     }
                 });
-
 
         return layout.build();
     }
 
+    @SuppressWarnings("unchecked")
     private SingleSelectionModel<Server> getSelectionModel() {
-        return ((SingleSelectionModel<Server>) serverConfigTable.getSelectionModel());
+        return (SingleSelectionModel<Server>) serverConfigTable.getSelectionModel();
     }
 
     @Override

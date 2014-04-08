@@ -25,11 +25,13 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.ProductConfig;
-import org.jboss.as.console.client.core.message.MessageBar;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.core.message.MessageCenterView;
 import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.RBACContextView;
+import org.jboss.as.console.client.search.Harvest;
+import org.jboss.as.console.client.search.Index;
+import org.jboss.as.console.client.search.SearchTool;
 import org.jboss.as.console.client.widgets.popups.DefaultPopup;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 
@@ -45,6 +47,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.layout.client.Layout;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -67,43 +70,30 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 @ApplicationScoped
 public class Header implements ValueChangeHandler<String>, org.uberfire.client.workbench.Header {
 
-    private HTMLPanel linksPane;
-    private String currentHighlightedSection = null;
-
-    //private DeckPanel subnavigation;
-
-    public static final String[][] SECTIONS = {
-            new String[]{NameTokens.ProfileMgmtPresenter, Console.CONSTANTS.common_label_profiles()},
-            new String[]{NameTokens.HostMgmtPresenter, "Hosts"},
-            new String[]{NameTokens.DomainRuntimePresenter, "Runtime"},
-            new String[]{NameTokens.AdministrationPresenter, "Administration"},
-    };
-
-    public static final String[][] SECTIONS_STANDALONE = {
-            new String[]{NameTokens.serverConfig, "Profile"},
-            new String[]{NameTokens.StandaloneRuntimePresenter, "Runtime"},
-            new String[]{NameTokens.AdministrationPresenter, "Administration"},
-    };
-
-    private final MessageBar messageBar;
-
-    //private Map<String,Widget> appLinks = new HashMap<String, Widget>();
-
+    private final FeatureSet featureSet;
+    private final ToplevelTabs toplevelTabs;
     private final ProductConfig productConfig;
     private final BootstrapContext bootstrap;
     private final MessageCenter messageCenter;
     private final PlaceManager placeManager;
+    private final Harvest harvest;
+    private final Index index;
+
+    private HTMLPanel linksPane;
+    private String currentHighlightedSection = null;
 
     @Inject
-    public Header(MessageCenter messageCenter, @POC ProductConfig productConfig, BootstrapContext bootstrap,
-                  @POC PlaceManager placeManager) {
-        this.messageBar = new MessageBar(messageCenter);
+    public Header(final FeatureSet featureSet, final ToplevelTabs toplevelTabs, MessageCenter messageCenter,
+            @POC ProductConfig productConfig, BootstrapContext bootstrap, @POC PlaceManager placeManager, Harvest harvest, Index index) {
+        this.featureSet = featureSet;
+        this.toplevelTabs = toplevelTabs;
+        this.messageCenter = messageCenter;
         this.productConfig = productConfig;
         this.bootstrap = bootstrap;
-        this.messageCenter = messageCenter;
         this.placeManager = placeManager;
+        this.harvest = harvest;
+        this.index = index;
         History.addValueChangeHandler(this);
-
     }
 
     @Override
@@ -153,7 +143,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         }
 
         bottom.add(debugTools);
-        bottom.setWidgetLeftWidth(links, 0, Style.Unit.PX, 500, Style.Unit.PX);
+        bottom.setWidgetLeftWidth(links, 0, Style.Unit.PX, 550, Style.Unit.PX);
         bottom.setWidgetTopHeight(links, 0, Style.Unit.PX, 44, Style.Unit.PX);
 
         bottom.setWidgetRightWidth(debugTools, 0, Style.Unit.PX, 50, Style.Unit.PX);
@@ -162,8 +152,14 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
 
         HorizontalPanel tools = new HorizontalPanel();
 
+        // global search
+        if (featureSet.isSearchEnabled()) {
+            if (Storage.isLocalStorageSupported()) {
+                tools.add(new SearchTool(harvest, index, placeManager));
+            }
+        }
 
-        //messages
+        // messages
         MessageCenterView messageCenterView = new MessageCenterView(messageCenter);
         Widget messageCenter = messageCenterView.asWidget();
         tools.add(messageCenter);
@@ -326,16 +322,13 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         linksPane.getElement().setAttribute("role", "menubar");
         linksPane.getElement().setAttribute("aria-controls", "main-content-area");
 
-        String[][] sections = bootstrap.isStandalone() ? SECTIONS_STANDALONE : SECTIONS;
-
-        for (String[] section : sections) {
-            final String token = section[0];
-            final String id = "header-" + token;
+        for (final ToplevelTabs.Config tlt : toplevelTabs) {
+            final String id = "header-" + tlt.getToken();
 
             SafeHtmlBuilder html = new SafeHtmlBuilder();
             html.appendHtmlConstant("<div class='header-link-label'>");
             html.appendHtmlConstant("<span role='menuitem'>");
-            html.appendHtmlConstant(section[1]);
+            html.appendHtmlConstant(tlt.getTitle());
             html.appendHtmlConstant("</span>");
             html.appendHtmlConstant("</div>");
             HTML widget = new HTML(html.toSafeHtml());
@@ -344,7 +337,8 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
             widget.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(token).build(), false);
+                    placeManager.revealPlace(
+                        new PlaceRequest.Builder().nameToken(tlt.getToken()).build(), tlt.isUpdateToken());
                 }
             });
             linksPane.add(widget, id);
@@ -359,24 +353,20 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
 
     private String createLinks() {
 
-        String[][] sections = bootstrap.getProperty(BootstrapContext.STANDALONE).equals("true") ? SECTIONS_STANDALONE : SECTIONS;
-
         SafeHtmlBuilder headerString = new SafeHtmlBuilder();
 
-        if(sections.length>0)
-        {
-            headerString.appendHtmlConstant("<table border=0 class='header-links' cellpadding=0 cellspacing=0 border=0>");
+        if (!toplevelTabs.isEmpty()) {
+            headerString
+                    .appendHtmlConstant("<table border=0 class='header-links' cellpadding=0 cellspacing=0 border=0>");
             headerString.appendHtmlConstant("<tr id='header-links-ref'>");
 
             headerString.appendHtmlConstant("<td><img src=\"images/blank.png\" width=1/></td>");
-            for (String[] section : sections) {
-
-                final String name = section[0];
-                final String id = "header-" + name;
+            for (ToplevelTabs.Config tlt : toplevelTabs) {
+                final String id = "header-" + tlt.getToken();
                 String styleClass = "header-link";
                 String styleAtt = "vertical-align:middle; text-align:center";
 
-                String td =  "<td style='"+styleAtt+"' id='" + id +"' class='"+styleClass+"'></td>";
+                String td = "<td style='" + styleAtt + "' id='" + id + "' class='" + styleClass + "'></td>";
 
                 headerString.appendHtmlConstant(td);
                 //headerString.append(title);
@@ -457,5 +447,10 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
     @Override
     public int getOrder() {
         return 0;
+    }
+
+    @Override
+    public String getId() {
+        return "HAL Header";
     }
 }

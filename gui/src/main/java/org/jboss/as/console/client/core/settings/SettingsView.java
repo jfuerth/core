@@ -19,9 +19,8 @@
 
 package org.jboss.as.console.client.core.settings;
 
-import static org.jboss.as.console.client.ProductConfig.Profile.COMMUNITY;
+import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -48,14 +47,14 @@ import org.jboss.ballroom.client.widgets.window.WindowContentBuilder;
  * @author Heiko Braun
  * @date 5/3/11
  */
-public class SettingsView extends PopupViewImpl implements SettingsPresenterWidget.MyView{
+public class SettingsView extends PopupViewImpl implements SettingsPresenterWidget.MyView {
 
     private DefaultWindow window;
     private SettingsPresenterWidget presenter;
-    private Form<CommonSettings> form ;
+    private Form<CommonSettings> form;
 
     @Inject
-    public SettingsView(EventBus eventBus) {
+    public SettingsView(EventBus eventBus, ProductConfig productConfig) {
         super(eventBus);
 
         window = new DefaultWindow(Console.CONSTANTS.common_label_settings());
@@ -64,23 +63,28 @@ public class SettingsView extends PopupViewImpl implements SettingsPresenterWidg
 
         form = new Form<CommonSettings>(CommonSettings.class);
 
-        ComboBoxItem localeItem = new ComboBoxItem(Preferences.Key.LOCALE.getToken(), Preferences.Key.LOCALE.getTitle());
-
-        localeItem.setDefaultToFirstOption(true);
-        localeItem.setValueMap(new String[] {"en", "de", "zh_Hans", "pt_BR", "fr", "es", "ja", "ko"});
+        ComboBoxItem localeItem = null;
+        List<String> locales = productConfig.getLocales();
+        if (locales.size() > 1) {
+            localeItem = new ComboBoxItem(Preferences.Key.LOCALE.getToken(),
+                    Preferences.Key.LOCALE.getTitle());
+            localeItem.setDefaultToFirstOption(true);
+            localeItem.setValueMap(locales);
+        }
 
         //CheckBoxItem useCache = new CheckBoxItem(Preferences.Key.USE_CACHE.getToken(), Preferences.Key.USE_CACHE.getTitle());
 
-        CheckBoxItem enableAnalytics = new CheckBoxItem(Preferences.Key.ANALYTICS.getToken(), Preferences.Key.ANALYTICS.getTitle());
+        CheckBoxItem enableAnalytics = new CheckBoxItem(Preferences.Key.ANALYTICS.getToken(),
+                Preferences.Key.ANALYTICS.getTitle());
 
-        ProductConfig productConfig = GWT.create(ProductConfig.class);
-        if (productConfig.getProfile() == COMMUNITY) {
+        if (localeItem != null) {
             form.setFields(localeItem, enableAnalytics);
         } else {
-            form.setFields(localeItem);
+            form.setFields(enableAnalytics);
         }
 
-        CheckBoxItem enableSecurityContextCache = new CheckBoxItem(Preferences.Key.SECURITY_CONTEXT.getToken(), Preferences.Key.SECURITY_CONTEXT.getTitle());
+        CheckBoxItem enableSecurityContextCache = new CheckBoxItem(Preferences.Key.SECURITY_CONTEXT.getToken(),
+                Preferences.Key.SECURITY_CONTEXT.getTitle());
 
         //form.setFields(localeItem, enableAnalytics, enableSecurityContextCache);
 
@@ -97,8 +101,7 @@ public class SettingsView extends PopupViewImpl implements SettingsPresenterWidg
                         presenter.hideView();
 
                         Feedback.confirm(Console.MESSAGES.restartRequired(), Console.MESSAGES.restartRequiredConfirm(),
-                                new Feedback.ConfirmationHandler()
-                                {
+                                new Feedback.ConfirmationHandler() {
                                     @Override
                                     public void onConfirmation(boolean isConfirmed) {
 
@@ -114,7 +117,8 @@ public class SettingsView extends PopupViewImpl implements SettingsPresenterWidg
 
                                        } */
                                     }
-                                });
+                                }
+                        );
                     }
                 },
                 Console.CONSTANTS.common_label_cancel(),
@@ -130,12 +134,22 @@ public class SettingsView extends PopupViewImpl implements SettingsPresenterWidg
 
         SafeHtmlBuilder html = new SafeHtmlBuilder();
         html.appendHtmlConstant("<ul>");
-        html.appendHtmlConstant("<li>").appendEscaped("Locale: The user interface language.");
-        if (productConfig.getProfile() == COMMUNITY) {
-            html.appendHtmlConstant("<li>").appendEscaped("Analytics: We track browser and operating system information in order to improve the user interface. ");
-            html.appendEscaped("You can disable the analytics feature at anytime.");
+        if (localeItem != null) {
+            html.appendHtmlConstant("<li>").appendEscaped("Locale: The user interface language.").appendHtmlConstant(
+                    "</li>");
         }
-
+        html.appendHtmlConstant("<li>");
+        html.appendEscaped(
+                "Enable Usage Data Collection: The Admin Console has the capability to collect usage data via ");
+        html.appendHtmlConstant("<a href=\"http://www.google.com/analytics/\" target=\"_blank\">Google Analytics</a>");
+        html.appendEscaped(
+                ". This data will be used exclusively by Red Hat to improve the console in future releases. By default this data collection is ");
+        if (productConfig.getProfile() == ProductConfig.Profile.COMMUNITY) {
+            html.appendEscaped("enabled, but you can disable collection of this data by unchecking the Enable Usage Data Collection box.");
+        } else {
+            html.appendEscaped("disabled, but you can enable collection of this data by checking the Enable Usage Data Collection box.");
+        }
+        html.appendHtmlConstant("</li>");
         //html.appendHtmlConstant("<li>").appendEscaped("Security Cache: If disabled the security context will be re-created everytime you access a dialog (performance hit).");
         html.appendHtmlConstant("</ul>");
         StaticHelpPanel help = new StaticHelpPanel(html.toSafeHtml());
@@ -144,9 +158,7 @@ public class SettingsView extends PopupViewImpl implements SettingsPresenterWidg
 
         window.setWidth(480);
         window.setHeight(360);
-
         window.trapWidget(new WindowContentBuilder(layout, options).build());
-
         window.setGlassEnabled(true);
         window.center();
     }

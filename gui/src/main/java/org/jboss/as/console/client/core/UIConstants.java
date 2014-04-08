@@ -118,7 +118,10 @@ public interface UIConstants extends Constants {
 
     String common_label_hosts();
 
+    @Deprecated
     String common_label_profiles();
+
+    String common_label_configuration();
 
     String common_label_properties();
 
@@ -999,4 +1002,272 @@ public interface UIConstants extends Constants {
     String unauthorized();
 
     String unauthorized_desc();
+
+    String duplicate_mail_server_type();
+
+    String duplicate_data_source_name();
+
+    String duplicate_data_source_jndi();
+
+    String subsys_jca_datasource_error_load();
+
+    String verify_datasource_failed_header();
+
+    String verify_datasource_successful_header();
+
+    String verify_datasource_internal_error();
+
+    String verify_datasource_disabled();
+
+    String verify_datasource_no_running_servers();
+
+    String verify_datasource_dependent_error();
+
+    String patch_manager_latest();
+
+    String patch_manager_apply_new();
+
+    String patch_manager_rollback();
+
+    String patch_manager_recently();
+
+    String patch_manager_error();
+
+    String patch_manager_stop_server_title();
+
+    String patch_manager_stop_server_yes();
+
+    String patch_manager_stop_server_no();
+
+    String patch_manager_select_patch_title();
+
+    String patch_manager_select_patch_body();
+
+    String patch_manager_stopping_servers_body();
+
+    String patch_manager_possible_actions();
+
+    String patch_manager_conflict_title();
+
+    String patch_manager_conflict_body();
+
+    String patch_manager_conflict_cancel_title();
+
+    String patch_manager_conflict_cancel_body();
+
+    String patch_manager_conflict_override_body();
+
+    String patch_manager_conflict_override_check();
+
+    String patch_manager_error_title();
+
+    String patch_manager_apply_error_body();
+
+    String patch_manager_apply_error_cancel_title();
+
+    String patch_manager_apply_error_cancel_body();
+
+    String patch_manager_apply_error_select_title();
+
+    String patch_manager_apply_error_select_body();
+
+    String patch_manager_show_details();
+
+    String patch_manager_hide_details();
+
+    String patch_manager_stop_server_error();
+
+    String patch_manager_stop_server_timeout();
+
+    String patch_manager_stop_server_unknown_error();
+
+    String patch_manager_stop_server_error_continue_title();
+
+    String patch_manager_stop_server_error_continue_body();
+
+    String patch_manager_stop_server_error_cancel_title();
+
+    String patch_manager_stop_server_error_cancel_body();
+
+    String patch_manager_select_file();
+
+    String patch_manager_restart_pending();
+
+    String patch_manager_restart_timeout();
+
+    String patch_manager_restart_error();
+
+    String patch_manager_desc_community();
+
+    String patch_manager_toolstrip_desc();
+
+    String patch_manager_patch_information();
+
+    String patch_manager_applied_at();
+
+    String patch_manager_apply_patch();
+
+    String patch_manager_apply_new_wizard_error();
+
+    String patch_manager_rollback_wizard_error();
+
+    String patch_manager_stop_server_question_for_apply();
+
+    String patch_manager_stop_server_question_for_rollback();
+
+    String patch_manager_servers_shutdown();
+
+    String patch_manager_select_patch_upload();
+
+    String patch_manager_update();
+
+    String patch_manager_restart_now();
+
+    String patch_manager_restart_no();
+
+    String patch_manager_applied_success();
+
+    String patch_manager_rollback_options_title();
+
+    String patch_manager_rollback_options_body();
+
+    String patch_manager_rollback_options_reset_configuration();
+
+    String patch_manager_rollback_options_reset_configuration_desc();
+
+    String patch_manager_rollback_options_override_all();
+
+    String patch_manager_rollback_options_override_all_desc();
+
+    String patch_manager_rollback_confirm_title();
+
+    String patch_manager_rollback_confirm_body();
+
+    String patch_manager_rolled_back_success_title();
+
+    String patch_manager_rolled_back_success_body();
+
+    String patch_manager_rollback_error_body();
+
+    String patch_manager_rollback_error_cancel_title();
+
+    String patch_manager_rollback_error_cancel_body();
+
+    String patch_manager_rollback_error_select_title();
+
+    String patch_manager_rollback_error_select_body();
+
+    String homepage_header_community();
+
+    String homepage_header_product();
+
+    String homepage_sidebar_header();
+
+    String section_configuration_intro();
+
+    String section_runtime_intro();
+
+    String section_domain_intro();
+
+    String section_administration_intro();
+
+    String content_box_create_datasource_title();
+
+    String content_box_new_deployment_title();
+
+    String content_box_new_deployment_link();
+
+    String content_box_apply_patch_title();
+
+    String content_box_role_assignment_title();
+
+    String content_box_role_assignment_link();
+
+    String content_box_create_server_group_title();
+
+    String content_box_create_server_group_link();
+
+    String content_box_topology_title();
+
+    String content_box_topology_link();
+
+    String sidebar_general_resources();
+
+    String sidebar_eap_documentation_text();
+
+    String sidebar_eap_documentation_link();
+
+    String sidebar_learn_more_eap_text();
+
+    String sidebar_learn_more_eap_link();
+
+    String sidebar_trouble_ticket_text();
+
+    String sidebar_trouble_ticket_link();
+
+    String sidebar_training_text();
+
+    String sidebar_training_link();
+
+    String sidebar_developer_resources();
+
+    String sidebar_tutorials_link();
+
+    String sidebar_tutorials_text();
+
+    String sidebar_eap_community_link();
+
+    String sidebar_eap_community_text();
+
+    String sidebar_operational_resources();
+
+    String sidebar_eap_configurations_link();
+
+    String sidebar_eap_configurations_text();
+
+    String sidebar_knowledgebase_link();
+
+    String sidebar_knowledgebase_text();
+
+    String sidebar_consulting_link();
+
+    String sidebar_consulting_text();
+
+    String sidebar_wilfdfly_documentation_text();
+
+    String sidebar_admin_guide_text();
+
+    String sidebar_wildfly_issues_text();
+
+    String sidebar_get_help();
+
+    String sidebar_irc_text();
+
+    String sidebar_user_forums_text();
+
+    String sidebar_developers_mailing_list_text();
+
+    String sidebar_wilfdfly_home_text();
+
+    String sidebar_model_reference_text();
+
+    String sidebar_latest_news();
+
+    String patch_manager_servers_still_running_warning();
+
+    String search_placeholder();
+
+    String search_tooltip_osx();
+
+    String search_tooltip_other();
+
+    String common_label_restart();
+
+    String patch_manager_restart_verify();
+
+    String patch_manager_restart_required();
+
+    String homepage_view_and_manage();
+
+    String homepage_common_tasks();
 }

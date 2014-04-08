@@ -25,6 +25,7 @@ import org.jboss.as.console.client.auth.CurrentUser;
 import org.jboss.as.console.client.auth.SignInPagePresenter;
 import org.jboss.as.console.client.core.ApplicationProperties;
 import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.FeatureSet;
 import org.jboss.as.console.client.core.Footer;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
@@ -51,10 +52,14 @@ import org.jboss.as.console.client.domain.runtime.DomainRuntimePresenter;
 import org.jboss.as.console.client.domain.topology.TopologyPresenter;
 import org.jboss.as.console.client.plugins.AccessControlRegistry;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
+import org.jboss.as.console.client.plugins.SearchIndexRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
 import org.jboss.as.console.client.rbac.HostManagementGatekeeper;
+import org.jboss.as.console.client.rbac.PlaceRequestSecurityFramework;
 import org.jboss.as.console.client.rbac.SecurityFramework;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
+import org.jboss.as.console.client.search.Harvest;
+import org.jboss.as.console.client.search.Index;
 import org.jboss.as.console.client.shared.DialogPresenter;
 import org.jboss.as.console.client.shared.deployment.DeploymentStore;
 import org.jboss.as.console.client.shared.expr.ExpressionResolver;
@@ -63,7 +68,9 @@ import org.jboss.as.console.client.shared.general.PathManagementPresenter;
 import org.jboss.as.console.client.shared.general.PropertiesPresenter;
 import org.jboss.as.console.client.shared.general.SocketBindingPresenter;
 import org.jboss.as.console.client.shared.help.HelpSystem;
+import org.jboss.as.console.client.shared.homepage.HomepagePresenter;
 import org.jboss.as.console.client.shared.model.SubsystemStore;
+import org.jboss.as.console.client.shared.patching.PatchManagerPresenter;
 import org.jboss.as.console.client.shared.runtime.RuntimeBaseAddress;
 import org.jboss.as.console.client.shared.runtime.ds.DataSourceMetricPresenter;
 import org.jboss.as.console.client.shared.runtime.env.EnvironmentPresenter;
@@ -172,6 +179,10 @@ public interface CoreUI {
     GoogleAnalytics getAnalytics();
     NavigationTracker getTracker();
 
+    Harvest getHarvest();
+    Index getIndex();
+    FeatureSet getFeatureSet();
+
     // ----------------------------------------------------------------------
 
     Header getHeader();
@@ -200,6 +211,8 @@ public interface CoreUI {
     ApplicationMetaData getApplicationMetaData();
 
     // ----------------------------------------------------------------------
+    AsyncProvider<HomepagePresenter> getHomepagePresenter();
+
     Provider<SignInPagePresenter> getSignInPagePresenter();
     AsyncProvider<MainLayoutPresenter> getMainLayoutPresenter();
     AsyncProvider<ToolsPresenter> getToolsPresenter();
@@ -329,6 +342,8 @@ public interface CoreUI {
 
     AsyncProvider<EnvironmentPresenter> EnvironmentPresenter();
 
+    AsyncProvider<PatchManagerPresenter> getPatchManagerProvider();
+
     // Administration
     AsyncProvider<AuditLogPresenter> getAuditLogPresenter();
 
@@ -336,7 +351,11 @@ public interface CoreUI {
     Provider<RepositoryPresenter> getRepositoryPresenter();
 
     AccessControlRegistry getAccessControlRegistry();
+
+    SearchIndexRegistry getSearchIndexRegistry();
+
     SecurityFramework getSecurityFramework();
+    PlaceRequestSecurityFramework getPlaceRequestSecurityContext();
 
     UnauthorisedPresenter getUnauthorisedPresenter();
 

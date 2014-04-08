@@ -29,11 +29,13 @@ import org.jboss.as.console.client.auth.SignInPagePresenter;
 import org.jboss.as.console.client.auth.SignInPageView;
 import org.jboss.as.console.client.core.ApplicationProperties;
 import org.jboss.as.console.client.core.BootstrapContext;
+import org.jboss.as.console.client.core.FeatureSet;
 import org.jboss.as.console.client.core.Footer;
 import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.MainLayoutViewImpl;
 import org.jboss.as.console.client.core.NewTokenFormatter;
+import org.jboss.as.console.client.core.ToplevelTabs;
 import org.jboss.as.console.client.core.message.MessageBar;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.core.message.MessageCenterImpl;
@@ -73,13 +75,20 @@ import org.jboss.as.console.client.domain.topology.TopologyView;
 import org.jboss.as.console.client.plugins.AccessControlRegistry;
 import org.jboss.as.console.client.plugins.RuntimeExtensionRegistry;
 import org.jboss.as.console.client.plugins.RuntimeLHSItemExtensionRegistryImpl;
+import org.jboss.as.console.client.plugins.SearchIndexRegistry;
+import org.jboss.as.console.client.plugins.SearchIndexRegistryImpl;
 import org.jboss.as.console.client.plugins.SubsystemRegistry;
 import org.jboss.as.console.client.plugins.SubsystemRegistryImpl;
 import org.jboss.as.console.client.rbac.HostManagementGatekeeper;
+import org.jboss.as.console.client.rbac.PlaceRequestSecurityFramework;
 import org.jboss.as.console.client.rbac.RBACGatekeeper;
 import org.jboss.as.console.client.rbac.SecurityFramework;
+import org.jboss.as.console.client.rbac.SecurityFrameworkImpl;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.rbac.UnauthorisedView;
+import org.jboss.as.console.client.search.Harvest;
+import org.jboss.as.console.client.search.Index;
+import org.jboss.as.console.client.search.IndexProvider;
 import org.jboss.as.console.client.shared.DialogPresenter;
 import org.jboss.as.console.client.shared.DialogView;
 import org.jboss.as.console.client.shared.DialogViewImpl;
@@ -95,8 +104,13 @@ import org.jboss.as.console.client.shared.general.PropertiesView;
 import org.jboss.as.console.client.shared.general.SocketBindingPresenter;
 import org.jboss.as.console.client.shared.general.SocketBindingView;
 import org.jboss.as.console.client.shared.help.HelpSystem;
+import org.jboss.as.console.client.shared.homepage.HomepagePresenter;
+import org.jboss.as.console.client.shared.homepage.HomepageView;
 import org.jboss.as.console.client.shared.model.SubsystemStore;
 import org.jboss.as.console.client.shared.model.SubsystemStoreImpl;
+import org.jboss.as.console.client.shared.patching.PatchManager;
+import org.jboss.as.console.client.shared.patching.PatchManagerPresenter;
+import org.jboss.as.console.client.shared.patching.PatchManagerView;
 import org.jboss.as.console.client.shared.runtime.RuntimeBaseAddress;
 import org.jboss.as.console.client.shared.runtime.ds.DataSourceMetricPresenter;
 import org.jboss.as.console.client.shared.runtime.ds.DataSourceMetricView;
@@ -245,6 +259,8 @@ public class CoreUIModule extends AbstractPresenterModule {
         requestStaticInjection(RuntimeBaseAddress.class);
         requestStaticInjection(Baseadress.class);
 
+        bind(Harvest.class).in(Singleton.class);
+        bind(Index.class).toProvider(IndexProvider.class).in(Singleton.class);
 
         // main layout
         bind(Header.class).toProvider(ErraiHeaderProvider.class);
@@ -270,6 +286,7 @@ public class CoreUIModule extends AbstractPresenterModule {
         bind(NavigationTracker.class).asEagerSingleton();
 
         bind(ModelVersions.class).in(Singleton.class);
+        bind(FeatureSet.class).in(Singleton.class);
 
         // ----------------------------------------------------------------------
 
@@ -293,6 +310,8 @@ public class CoreUIModule extends AbstractPresenterModule {
         bind(ApplicationMetaData.class).in(Singleton.class);
 
         bind(DomainEntityManager.class).toProvider(ErraiDomainEntityManagerProvider.class);
+        bind(PatchManager.class).in(Singleton.class);
+        bind(ToplevelTabs.class).in(Singleton.class);
 
         // sign in
         bindPresenter(SignInPagePresenter.class, SignInPagePresenter.MyView.class,
@@ -303,6 +322,12 @@ public class CoreUIModule extends AbstractPresenterModule {
                 MainLayoutPresenter.MainLayoutView.class,
                 MainLayoutViewImpl.class,
                 MainLayoutPresenter.MainLayoutProxy.class);
+
+        // homepage
+        bindPresenter(HomepagePresenter.class,
+                HomepagePresenter.MyView.class,
+                HomepageView.class,
+                HomepagePresenter.MyProxy.class);
 
         // tools
         bindPresenter(ToolsPresenter.class,
@@ -662,6 +687,11 @@ public class CoreUIModule extends AbstractPresenterModule {
                 EnvironmentView.class,
                 EnvironmentPresenter.MyProxy.class);
 
+        bindPresenter(PatchManagerPresenter.class,
+                PatchManagerPresenter.MyView.class,
+                PatchManagerView.class,
+                PatchManagerPresenter.MyProxy.class);
+
         // Administration
         bindPresenter(AuditLogPresenter.class,
                 AuditLogPresenter.MyView.class,
@@ -685,6 +715,10 @@ public class CoreUIModule extends AbstractPresenterModule {
         bind(SecurityFramework.class).toProvider(ErraiSecurityFrameworkProvider.class);
 
         bind(CoreGUIContext.class).toProvider(ErraiCoreGUIContextProvider.class);
+        bind(SearchIndexRegistry.class).to(SearchIndexRegistryImpl.class).in(Singleton.class);
+
+        bind(SecurityFramework.class).to(SecurityFrameworkImpl.class).in(Singleton.class);
+        bind(PlaceRequestSecurityFramework.class).in(Singleton.class);
 
         /* use this to test against 6.x until the RBAC facilities are available */
         //bind(SecurityFramework.class).to(MockSecurityFramework.class).in(Singleton.class);

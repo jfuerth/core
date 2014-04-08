@@ -90,6 +90,7 @@ public class Footer implements org.uberfire.client.workbench.Footer {
         if (!GWT.isScript()) {
             toolReference.add(new String[]{"Modelling", "mbui-workbench"});
             toolReference.add(new String[]{"Resource Access", "access-log"});
+//            toolReference.add(new String[]{"Search Index", "indexing"});
         }
 
         final VerticalPanel toolsList = new VerticalPanel();
@@ -200,5 +201,10 @@ public class Footer implements org.uberfire.client.workbench.Footer {
     @Override
     public int getOrder() {
         return -10;
+    }
+
+    @Override
+    public String getId() {
+        return "HAL Footer";
     }
 }

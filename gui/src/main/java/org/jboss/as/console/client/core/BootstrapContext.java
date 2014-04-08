@@ -31,8 +31,10 @@ import javax.inject.Inject;
 
 import org.jboss.as.console.client.ProductConfig;
 import org.jboss.as.console.client.domain.model.ProfileRecord;
+import org.jboss.as.console.client.domain.model.ServerInstance;
 import org.jboss.as.console.client.poc.POC;
 import org.jboss.as.console.client.rbac.StandardRole;
+import org.jboss.as.console.client.shared.state.HostList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -54,10 +56,12 @@ public class BootstrapContext implements ApplicationProperties {
     private boolean hostManagementDisabled;
     private boolean groupManagementDisabled;
     private Set<String> roles;
-    private Set<String> addressableHosts = Collections.EMPTY_SET;
-    private Set<String> addressableGroups = Collections.EMPTY_SET;
+    private HostList initialHosts;
+    private Set<String> addressableHosts = Collections.emptySet();
+    private Set<String> addressableGroups = Collections.emptySet();
     private String runAs;
     private List<ProfileRecord> initialProfiles;
+    private ServerInstance initialServer;
 
     @Inject @POC ProductConfig productConfig;
 
@@ -75,6 +79,9 @@ public class BootstrapContext implements ApplicationProperties {
 
         String deploymentApi = GWT.isScript() ? getBaseUrl()+"management/add-content" : "http://"+devHost+":8888/app/upload";
         setProperty(DEPLOYMENT_API, deploymentApi);
+
+        String patchApi = GWT.isScript() ? getBaseUrl()+"management-upload" : "http://"+devHost+":8888/app/patch";
+        setProperty(PATCH_API, patchApi);
 
         String logoutApi = GWT.isScript() ? getBaseUrl()+"logout" : "http://"+devHost+":8888/app/logout";
         setProperty(LOGOUT_API, logoutApi);
@@ -146,17 +153,7 @@ public class BootstrapContext implements ApplicationProperties {
     }
 
     public PlaceRequest getDefaultPlace() {
-        PlaceRequest.Builder builder = new PlaceRequest.Builder();
-        if (isStandalone()) {
-            builder.nameToken(NameTokens.StandaloneRuntimePresenter);
-        } else {
-            if (isGroupManagementDisabled()) {
-                // HAL-336: If there are no groups, fallback to profile
-                builder.nameToken(NameTokens.ProfileMgmtPresenter);
-            } else {
-                builder.nameToken(NameTokens.DomainRuntimePresenter);
-            }
-        }
+        PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(NameTokens.HomepagePresenter);
         return builder.build();
     }
 
@@ -303,5 +300,21 @@ public class BootstrapContext implements ApplicationProperties {
 
     public List<ProfileRecord> getInitialProfiles() {
         return initialProfiles;
+    }
+
+    public HostList getInitialHosts() {
+        return initialHosts;
+    }
+
+    public void setInitialHosts(final HostList initialHosts) {
+        this.initialHosts = initialHosts;
+    }
+
+    public void setInitialServer(final ServerInstance initialServer) {
+        this.initialServer = initialServer;
+    }
+
+    public ServerInstance getInitialServer() {
+        return initialServer;
     }
 }

@@ -33,6 +33,7 @@ import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import org.jboss.as.console.client.plugins.AccessControlMetaData;
 import org.jboss.as.console.client.plugins.BootstrapOperation;
 import org.jboss.as.console.client.plugins.RuntimeExtensionMetaData;
+import org.jboss.as.console.client.plugins.SearchIndexMetaData;
 import org.jboss.as.console.client.plugins.SubsystemExtensionMetaData;
 
 /**
@@ -40,41 +41,26 @@ import org.jboss.as.console.client.plugins.SubsystemExtensionMetaData;
  * @date 9/13/12
  */
 
+
 @SupportedSourceVersion(RELEASE_7)
 public class SPIProcessor extends AbstractProcessor {
 
     private static final String EXTENSION_TEMPLATE = "Extension.tmpl";
     private static final String EXTENSION_FILENAME = "org.jboss.as.console.client.core.gin.Composite";
-
     private static final String BINDING_TEMPLATE = "ExtensionBinding.tmpl";
     private final static String BINDING_FILENAME = "org.jboss.as.console.client.core.gin.CompositeBinding";
-
     private static final String BEAN_FACTORY_TEMPLATE = "BeanFactory.tmpl";
     private static final String BEAN_FACTORY_FILENAME = "org.jboss.as.console.client.shared.BeanFactory";
-
     private static final String SUBSYSTEM_FILENAME = "org.jboss.as.console.client.plugins.SubsystemRegistryImpl";
     private static final String SUBSYSTEM_TEMPLATE = "SubsystemExtensions.tmpl";
-
     private static final String ACCESS_FILENAME = "org.jboss.as.console.client.plugins.AccessControlRegistryImpl";
     private static final String ACCESS_TEMPLATE = "AccessControlRegistry.tmpl";
-
+    private static final String SEARCH_INDEX_FILENAME = "org.jboss.as.console.client.plugins.SearchIndexRegistryImpl";
+    private static final String SEARCH_INDEX_TEMPLATE = "SearchIndexRegistry.tmpl";
     private static final String RUNTIME_FILENAME = "org.jboss.as.console.client.plugins.RuntimeLHSItemExtensionRegistryImpl";
     private static final String RUNTIME_TEMPLATE = "RuntimeExtensions.tmpl";
-
     private static final String VERSION_INFO_FILENAME = "org.jboss.as.console.client.VersionInfo";
     private static final String VERSION_INFO_TEMPLATE = "VersionInfo.tmpl";
-
-    private static final String MODULE_FILENAME = "App.gwt.xml";
-    private static final String MODULE_DEV_FILENAME = "App_dev.gwt.xml";
-    private static final String MODULE_PRODUCT_FILENAME = "App_RH.gwt.xml";
-    private static final String MODULE_PRODUCT_DEV_FILENAME = "App_RH_dev.gwt.xml";
-
-    private static final String MODULE_TEMPLATE = "App.gwt.xml.tmpl";
-    private static final String MODULE_DEV_TEMPLATE = "App_dev.gwt.xml.tmpl";
-    private static final String MODULE_PRODUCT_TEMPLATE = "App_RH.gwt.xml.tmpl";
-    private static final String MODULE_PRODUCT_DEV_TEMPLATE = "App_RH_dev.gwt.xml.tmpl";
-
-    private static final String MODULE_PACKAGENAME = "org.jboss.as.console.composite";
 
     private Filer filer;
     private ProcessingEnvironment processingEnv;
@@ -84,10 +70,12 @@ public class SPIProcessor extends AbstractProcessor {
     private List<String> categoryClasses;
     private List<SubsystemExtensionMetaData> subsystemDeclararions;
     private List<AccessControlMetaData> accessControlDeclararions;
+    private List<SearchIndexMetaData> searchIndexDeclarations;
     private List<BootstrapOperation> bootstrapOperations;
     private List<RuntimeExtensionMetaData> runtimeExtensions;
     private Set<String> modules = new LinkedHashSet<>();
     private Set<String> nameTokens;
+    private List<ModuleConfig> moduleConfigs;
     private Map<String, String> gwtConfigProps;
 
     @Override
@@ -100,9 +88,18 @@ public class SPIProcessor extends AbstractProcessor {
         this.categoryClasses = new ArrayList<>();
         this.subsystemDeclararions = new ArrayList<>();
         this.accessControlDeclararions = new ArrayList<>();
-        this.bootstrapOperations= new ArrayList<>();
+        this.searchIndexDeclarations = new ArrayList<>();
+        this.bootstrapOperations = new ArrayList<>();
         this.runtimeExtensions = new ArrayList<>();
         this.nameTokens = new HashSet<>();
+
+        moduleConfigs = new ArrayList<ModuleConfig>();
+        moduleConfigs.add(new ModuleConfig(filer, "App_base.gwt.xml.tmpl", "App.gwt.xml"));
+        moduleConfigs.add(new ModuleConfig(filer, "App_WF.gwt.xml.tmpl", "App_WF.gwt.xml"));
+        moduleConfigs.add(new ModuleConfig(filer, "App_WF_full.gwt.xml.tmpl", "App_WF_full.gwt.xml"));
+        moduleConfigs.add(new ModuleConfig(filer, "App_WF_dev.gwt.xml.tmpl", "App_WF_dev.gwt.xml"));
+        moduleConfigs.add(new ModuleConfig(filer, "App_RH.gwt.xml.tmpl", "App_RH.gwt.xml"));
+        moduleConfigs.add(new ModuleConfig(filer, "App_RH_dev.gwt.xml.tmpl", "App_RH_dev.gwt.xml"));
 
         env.getMessager();
         parseGwtProperties();
@@ -111,10 +108,8 @@ public class SPIProcessor extends AbstractProcessor {
     private void parseGwtProperties() {
         Map<String, String> options = processingEnv.getOptions();
         gwtConfigProps = new HashMap<String, String>();
-        for(String key : options.keySet())
-        {
-            if(key.startsWith("gwt."))
-            {
+        for (String key : options.keySet()) {
+            if (key.startsWith("gwt.")) {
                 gwtConfigProps.put(key.substring(4, key.length()), options.get(key));
             }
         }
@@ -134,8 +129,7 @@ public class SPIProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> typeElements, RoundEnvironment roundEnv) {
 
-
-        if(!roundEnv.processingOver()) {
+        if (!roundEnv.processingOver()) {
 
             System.out.println("=================================");
             System.out.println("Begin Components discovery ...");
@@ -150,10 +144,10 @@ public class SPIProcessor extends AbstractProcessor {
             System.out.println("Begin Bindings discovery ...");
             System.out.println("=================================");
 
-            Set<? extends Element> extensionBindingElements = roundEnv.getElementsAnnotatedWith(GinExtensionBinding.class);
+            Set<? extends Element> extensionBindingElements = roundEnv
+                    .getElementsAnnotatedWith(GinExtensionBinding.class);
 
-            for (Element element: extensionBindingElements)
-            {
+            for (Element element : extensionBindingElements) {
                 handleGinExtensionBindingElement(element);
             }
 
@@ -180,9 +174,17 @@ public class SPIProcessor extends AbstractProcessor {
             System.out.println("=================================");
             Set<? extends Element> accessElements = roundEnv.getElementsAnnotatedWith(NameToken.class);
 
-            for (Element element: accessElements)
-            {
+            for (Element element : accessElements) {
                 handleAccessControlElement(element);
+            }
+
+            System.out.println("=================================");
+            System.out.println("Parse SearchIndex metadata ...");
+            System.out.println("=================================");
+            Set<? extends Element> searchIndexElements = roundEnv.getElementsAnnotatedWith(NameToken.class);
+
+            for (Element element : searchIndexElements) {
+                handleSearchIndexElement(element);
             }
 
             System.out.println("=================================");
@@ -214,19 +216,16 @@ public class SPIProcessor extends AbstractProcessor {
 
 
         List<? extends AnnotationMirror> annotationMirrors = element.getAnnotationMirrors();
-        for (AnnotationMirror mirror: annotationMirrors)
-        {
+        for (AnnotationMirror mirror : annotationMirrors) {
             final String annotationType = mirror.getAnnotationType().toString();
 
-            if ( annotationType.equals(NameToken.class.getName()) )
-            {
+            if (annotationType.equals(NameToken.class.getName())) {
                 NameToken nameToken = element.getAnnotation(NameToken.class);
                 AccessControl accessControl = element.getAnnotation(AccessControl.class);
 
-                if(accessControl!=null)   {
+                if (accessControl != null) {
 
-                    for(String resourceAddress : accessControl.resources())
-                    {
+                    for (String resourceAddress : accessControl.resources()) {
                         AccessControlMetaData declared = new AccessControlMetaData(
                                 nameToken.value(), resourceAddress
                         );
@@ -236,11 +235,11 @@ public class SPIProcessor extends AbstractProcessor {
                         accessControlDeclararions.add(declared);
                     }
 
-                    for(String opString : accessControl.operations())
-                    {
+                    for (String opString : accessControl.operations()) {
 
-                        if(!opString.contains("#"))
-                            throw new IllegalArgumentException("Invalid operation string:"+ opString);
+                        if (!opString.contains("#")) {
+                            throw new IllegalArgumentException("Invalid operation string:" + opString);
+                        }
 
                         BootstrapOperation op = new BootstrapOperation(
                                 nameToken.value(), opString
@@ -249,11 +248,46 @@ public class SPIProcessor extends AbstractProcessor {
                     }
 
 
+                } else if (element.getAnnotation(NoGatekeeper.class) == null) {
+                    Name simpleName = element.getEnclosingElement() != null ? element.getEnclosingElement()
+                            .getSimpleName() : element.getSimpleName();
+                    System.out.println(
+                            simpleName + "(#" + nameToken.value() + ")" + " is missing @AccessControl annotation!");
                 }
-                else if(element.getAnnotation(NoGatekeeper.class)==null)
-                {
-                    Name simpleName = element.getEnclosingElement()!=null ? element.getEnclosingElement().getSimpleName() : element.getSimpleName();
-                    System.out.println(simpleName +"(#"+nameToken.value()+")" +" is missing @AccessControl annotation!");
+            }
+        }
+    }
+
+    private void handleSearchIndexElement(final Element element) {
+        List<? extends AnnotationMirror> annotationMirrors = element.getAnnotationMirrors();
+        for (AnnotationMirror mirror : annotationMirrors) {
+            final String annotationType = mirror.getAnnotationType().toString();
+
+            if (annotationType.equals(NameToken.class.getName())) {
+                NameToken nameToken = element.getAnnotation(NameToken.class);
+                AccessControl accessControl = element.getAnnotation(AccessControl.class);
+                SearchIndex searchIndex = element.getAnnotation(SearchIndex.class);
+                OperationMode operationMode = element.getAnnotation(OperationMode.class);
+
+                if (accessControl != null) {
+                    boolean standalone = true;
+                    boolean domain = true;
+                    String[] keywords = null;
+                    boolean include = true;
+                    if (searchIndex != null) {
+                        keywords = searchIndex.keywords();
+                        include = !searchIndex.exclude();
+                    }
+                    if (operationMode != null) {
+                        standalone = operationMode.value() == OperationMode.Mode.STANDALONE;
+                        domain = operationMode.value() == OperationMode.Mode.DOMAIN;
+                    }
+                    if (include) {
+                        // excluded presenters are not part of the metadata!
+                        SearchIndexMetaData searchIndexMetaData = new SearchIndexMetaData(nameToken.value(), standalone,
+                                domain, accessControl.resources(), keywords);
+                        searchIndexDeclarations.add(searchIndexMetaData);
+                    }
                 }
             }
         }
@@ -356,13 +390,14 @@ public class SPIProcessor extends AbstractProcessor {
         writeBeanFactoryFile();
         writeSubsystemFile();
         writeAccessControlFile();
+        writeSearchIndexFile();
         writeRuntimeFile();
-        writeModuleFile();
-        writeDevModuleFile();
-        writeProductModuleFile();
-        writeProductDevModuleFile();
         writeProxyConfigurations();
         writeVersionInfo();
+
+        for (ModuleConfig moduleConfig : moduleConfigs) {
+            moduleConfig.writeModuleFile(modules, gwtConfigProps);
+        }
     }
 
     private void writeAccessControlFile() throws Exception {
@@ -373,6 +408,17 @@ public class SPIProcessor extends AbstractProcessor {
         JavaFileObject sourceFile = filer.createSourceFile(ACCESS_FILENAME);
         OutputStream output = sourceFile.openOutputStream();
         new TemplateProcessor().process(ACCESS_TEMPLATE, model, output);
+        output.flush();
+        output.close();
+    }
+
+    private void writeSearchIndexFile() throws IOException {
+        Map<String, Object> model = new HashMap<>();
+        model.put("metaData", searchIndexDeclarations);
+
+        JavaFileObject sourceFile = filer.createSourceFile(SEARCH_INDEX_FILENAME);
+        OutputStream output = sourceFile.openOutputStream();
+        new TemplateProcessor().process(SEARCH_INDEX_TEMPLATE, model, output);
         output.flush();
         output.close();
     }
@@ -436,77 +482,6 @@ public class SPIProcessor extends AbstractProcessor {
         output.close();
     }
 
-    private void writeModuleFile() {
-        try {
-            Map<String, Object> model = new HashMap<>();
-            model.put("modules", modules);
-            model.put("properties", gwtConfigProps);
-
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, MODULE_PACKAGENAME,
-                    MODULE_FILENAME);
-            OutputStream output = sourceFile.openOutputStream();
-            new TemplateProcessor().process(MODULE_TEMPLATE, model, output);
-            output.flush();
-            output.close();
-            System.out.println("Written GWT module to " + sourceFile.toUri().toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create file", e);
-        }
-    }
-
-    private void writeDevModuleFile() {
-        try {
-            Map<String, Object> model = new HashMap<>();
-            model.put("modules", modules);
-            model.put("properties", gwtConfigProps);
-
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, MODULE_PACKAGENAME,
-                    MODULE_DEV_FILENAME);
-            OutputStream output = sourceFile.openOutputStream();
-            new TemplateProcessor().process(MODULE_DEV_TEMPLATE, model, output);
-            output.flush();
-            output.close();
-            System.out.println("Written GWT dev module to " + sourceFile.toUri().toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create file", e);
-        }
-    }
-
-    private void writeProductModuleFile() {
-        try {
-            Map<String, Object> model = new HashMap<>();
-            model.put("modules", modules);
-            model.put("properties", gwtConfigProps);
-
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, MODULE_PACKAGENAME,
-                    MODULE_PRODUCT_FILENAME);
-            OutputStream output = sourceFile.openOutputStream();
-            new TemplateProcessor().process(MODULE_PRODUCT_TEMPLATE, model, output);
-            output.flush();
-            output.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create file", e);
-        }
-    }
-
-    private void writeProductDevModuleFile() {
-        try {
-            Map<String, Object> model = new HashMap<>();
-            model.put("modules", modules);
-            model.put("properties", gwtConfigProps);
-
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, MODULE_PACKAGENAME,
-                    MODULE_PRODUCT_DEV_FILENAME);
-            OutputStream output = sourceFile.openOutputStream();
-            new TemplateProcessor().process(MODULE_PRODUCT_DEV_TEMPLATE, model, output);
-            output.flush();
-            output.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create file", e);
-        }
-    }
-
-
     private void writeProxyConfigurations() {
         try {
             String devHost = gwtConfigProps.get("console.dev.host") != null ? gwtConfigProps
@@ -527,16 +502,22 @@ public class SPIProcessor extends AbstractProcessor {
             OutputStream output2 = sourceFile2.openOutputStream();
 
             FileObject sourceFile3 = filer.createResource(
-                    StandardLocation.SOURCE_OUTPUT, "", "logout.properties");
+                    StandardLocation.SOURCE_OUTPUT, "", "patch-proxy.properties");
             OutputStream output3 = sourceFile3.openOutputStream();
+
+            FileObject sourceFile4 = filer.createResource(
+                    StandardLocation.SOURCE_OUTPUT, "", "logout.properties");
+            OutputStream output4 = sourceFile4.openOutputStream();
 
             new TemplateProcessor().process("gwt.proxy.tmpl", model, output1);
             new TemplateProcessor().process("gwt.proxy.upload.tmpl", model, output2);
-            new TemplateProcessor().process("gwt.proxy.logout.tmpl", model, output3);
+            new TemplateProcessor().process("gwt.proxy.patch.tmpl", model, output3);
+            new TemplateProcessor().process("gwt.proxy.logout.tmpl", model, output4);
 
             output1.close();
             output2.close();
             output3.close();
+            output4.close();
         } catch (IOException e) {
             throw new RuntimeException("Failed to create file", e);
         }

@@ -27,6 +27,7 @@ public class NameTokens {
 
     public static final String mainLayout = "main";
 
+    public static final String HomepagePresenter = "home";
     public static final String BoundedQueueThreadPoolPresenter = "threads";
     public static final String ConfigAdminPresenter = "configadmin";
     public static final String DataSourcePresenter = "datasources";
@@ -67,6 +68,7 @@ public class NameTokens {
     public static final String TransactionPresenter = "transactions";
     public static final String StandaloneRuntimePresenter = "standalone-runtime";
     public static final String DomainRuntimePresenter = "domain-runtime";
+    public static final String PatchingPresenter = "patching";
 
     public static final String TXMetrics = "tx-metrics";
     public static final String TXLogs = "tx-logs";

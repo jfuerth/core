@@ -99,23 +99,22 @@ public class ProfileMgmtPresenter
     }
 
     @Override
-    protected void onFirstReveal(final PlaceRequest placeRequest) {
+    protected void onFirstReveal(final PlaceRequest placeRequest, PlaceManager placeManager, boolean revealDefault) {
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
             @Override
             public void execute() {
                 loadProfiles();
             }
         });
-    }
-
-    @Override
-    protected void onDefaultPlace(final PlaceManager placeManager) {
-        subsysStore.loadSubsystems(profileSelection.getName(), new SimpleCallback<List<SubsystemRecord>>() {
-            @Override
-            public void onSuccess(List<SubsystemRecord> existingSubsystems) {
-                revealDefaultSubsystem(preferredPlace(), existingSubsystems);
-            }
-        });
+        if(revealDefault)
+        {
+            subsysStore.loadSubsystems(profileSelection.getName(), new SimpleCallback<List<SubsystemRecord>>() {
+                @Override
+                public void onSuccess(List<SubsystemRecord> existingSubsystems) {
+                    revealDefaultSubsystem(preferredPlace(), existingSubsystems);
+                }
+            });
+        }
     }
 
     private void revealDefaultSubsystem(PlaceRequest preference, List<SubsystemRecord> existingSubsystems) {

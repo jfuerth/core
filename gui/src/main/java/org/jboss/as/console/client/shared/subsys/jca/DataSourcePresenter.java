@@ -19,9 +19,16 @@
 
 package org.jboss.as.console.client.shared.subsys.jca;
 
+import static org.jboss.as.console.client.shared.subsys.jca.VerifyConnectionOp.VerifyResult;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
@@ -33,14 +40,20 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.core.ApplicationProperties;
+import org.jboss.as.console.client.core.Footer;
 import org.jboss.as.console.client.core.NameTokens;
 import org.jboss.as.console.client.core.SuspendableView;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.domain.profiles.CurrentProfileSelection;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.flow.FunctionContext;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.properties.NewPropertyWizard;
 import org.jboss.as.console.client.shared.properties.PropertyManagement;
 import org.jboss.as.console.client.shared.properties.PropertyRecord;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.jca.functions.LoadDataSourcesFunction;
+import org.jboss.as.console.client.shared.subsys.jca.functions.LoadXADataSourcesFunction;
 import org.jboss.as.console.client.shared.subsys.jca.model.DataSource;
 import org.jboss.as.console.client.shared.subsys.jca.model.DataSourceStore;
 import org.jboss.as.console.client.shared.subsys.jca.model.DriverRegistry;
@@ -52,19 +65,19 @@ import org.jboss.as.console.client.shared.subsys.jca.wizard.NewDatasourceWizard;
 import org.jboss.as.console.client.shared.subsys.jca.wizard.NewXADatasourceWizard;
 import org.jboss.as.console.spi.AccessControl;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.ballroom.client.widgets.window.Feedback;
-
-import java.util.List;
-import java.util.Map;
-
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.gwt.flow.client.Async;
+import org.jboss.gwt.flow.client.Outcome;
 
 /**
  * @author Heiko Braun
- * @date 3/24/11
  */
 public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, DataSourcePresenter.MyProxy>
         implements PropertyManagement {
 
+    private final DispatchAsync dispatcher;
+    private final BeanFactory beanFactory;
+    private final CurrentProfileSelection currentProfileSelection;
     private boolean hasBeenRevealed = false;
     private DefaultWindow window;
 
@@ -73,6 +86,9 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
     private RevealStrategy revealStrategy;
     private ApplicationProperties bootstrap;
     private DefaultWindow propertyWindow;
+    private List<DataSource> datasources;
+    private List<JDBCDriver> drivers = Collections.EMPTY_LIST;
+    private List<XADataSource> xaDatasources;
 
     @ProxyCodeSplit
     @NameToken(NameTokens.DataSourcePresenter)
@@ -80,10 +96,10 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
             "/{selected.profile}/subsystem=datasources/data-source=*",
             "/{selected.profile}/subsystem=datasources/xa-data-source=*"
     })
-    public interface MyProxy extends Proxy<DataSourcePresenter>, Place {
-    }
+    public interface MyProxy extends Proxy<DataSourcePresenter>, Place {}
 
     public interface MyView extends SuspendableView {
+
         void setPresenter(DataSourcePresenter presenter);
         void updateDataSources(List<DataSource> datasources);
         void updateXADataSources(List<XADataSource> result);
@@ -92,22 +108,27 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         void setPoolConfig(String name, PoolConfig poolConfig);
         void setXAPoolConfig(String dsName, PoolConfig underlying);
         void setXAProperties(String dataSourceName, List<PropertyRecord> result);
-        void setConnectionVerified(boolean b, String dataSourceName);
         void setConnectionProperties(String reference, List<PropertyRecord> properties);
-
+        void showVerifyConncectionResult(final String name, VerifyResult result);
     }
 
     @Inject
-    public DataSourcePresenter(
-            EventBus eventBus, MyView view, MyProxy proxy,
-            DataSourceStore dataSourceStore, DriverRegistry driverRegistry,
-            RevealStrategy revealStrategy, ApplicationProperties bootstrap) {
+    public DataSourcePresenter(EventBus eventBus, MyView view, MyProxy proxy, DataSourceStore dataSourceStore,
+            DriverRegistry driverRegistry, RevealStrategy revealStrategy, ApplicationProperties bootstrap,
+            DispatchAsync dispatcher, BeanFactory beanFactory, CurrentProfileSelection currentProfileSelection) {
+
         super(eventBus, view, proxy);
+        this.dispatcher = dispatcher;
+        this.beanFactory = beanFactory;
+        this.currentProfileSelection = currentProfileSelection;
 
         this.dataSourceStore = new DataSourceStoreInterceptor(dataSourceStore);
         this.driverRegistry = driverRegistry.create();
         this.revealStrategy = revealStrategy;
         this.bootstrap = bootstrap;
+        this.datasources = new ArrayList<DataSource>();
+        this.xaDatasources = new ArrayList<XADataSource>();
+        this.drivers = new ArrayList<JDBCDriver>();
     }
 
     @Override
@@ -116,18 +137,46 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         getView().setPresenter(this);
     }
 
-
     @Override
     protected void onReset() {
         super.onReset();
 
-        loadDataSources();
-        loadXADataSources();
+        Outcome<FunctionContext> resetOutcome = new Outcome<FunctionContext>() {
+            @Override
+            public void onFailure(final FunctionContext context) {
+                Console.error(Console.CONSTANTS.subsys_jca_datasource_error_load(), context.getErrorMessage());
+                if (!hasBeenRevealed) {
+                    hasBeenRevealed = true;
+                }
+            }
 
-        if(!hasBeenRevealed)
-        {
-            hasBeenRevealed=true;
-        }
+            @Override
+            public void onSuccess(final FunctionContext context) {
+                // reading this kind of information is expensive, so cache the results until the next call to reset()
+                datasources = context.get(LoadDataSourcesFunction.KEY);
+                xaDatasources = context.get(LoadXADataSourcesFunction.KEY);
+
+                getView().updateDataSources(datasources);
+                getView().updateXADataSources(xaDatasources);
+
+                if (!hasBeenRevealed) {
+                    hasBeenRevealed = true;
+                }
+
+                // postpone driver auto detection. can be executed in the background
+
+                Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+                    @Override
+                    public void execute() {
+                        loadDrivers();
+                    }
+                });
+            }
+        };
+
+        new Async<FunctionContext>(Footer.PROGRESS_ELEMENT)
+                .waterfall(new FunctionContext(), resetOutcome, new LoadDataSourcesFunction(dataSourceStore),
+                        new LoadXADataSourcesFunction(dataSourceStore));
     }
 
     @Override
@@ -135,14 +184,29 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         revealStrategy.revealInParent(this);
     }
 
+    private void loadDrivers() {
+        // Will start a nested async waterfall
+        driverRegistry.refreshDrivers(new AsyncCallback<List<JDBCDriver>>() {
+            @Override
+            public void onFailure(final Throwable caught) {
+                Console.warning("Failed to auto detect JDBC driver: " + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(final List<JDBCDriver> result) {
+                DataSourcePresenter.this.drivers = result;
+            }
+        });
+    }
+
     private void loadDataSources() {
         dataSourceStore.loadDataSources(new SimpleCallback<List<DataSource>>() {
             @Override
             public void onSuccess(List<DataSource> result) {
-                getView().updateDataSources(result);
+                datasources = result;
+                getView().updateDataSources(datasources);
             }
         });
-
     }
 
     private void loadXADataSources() {
@@ -150,85 +214,35 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
 
             @Override
             public void onSuccess(List<XADataSource> result) {
-                getView().updateXADataSources(result);
+                xaDatasources = result;
+                getView().updateXADataSources(xaDatasources);
             }
         });
     }
 
     public void launchNewDatasourceWizard() {
 
-        driverRegistry.refreshDrivers(new SimpleCallback<List<JDBCDriver>>() {
-            @Override
-            public void onSuccess(List<JDBCDriver> drivers) {
+        window = new DefaultWindow(Console.MESSAGES.createTitle("Datasource"));
+        window.setWidth(480);
+        window.setHeight(450);
+        window.setWidget(new NewDatasourceWizard(DataSourcePresenter.this, drivers, datasources, bootstrap)
+                .asWidget());
+        window.setGlassEnabled(true);
+        window.center();
 
-                if(drivers.size()>0)
-                {
-                    window = new DefaultWindow(Console.MESSAGES.createTitle("Datasource"));
-                    window.setWidth(480);
-                    window.setHeight(450);
-
-                    window.setWidget(
-                            new NewDatasourceWizard(DataSourcePresenter.this, drivers, bootstrap).asWidget()
-                    );
-
-                    window.setGlassEnabled(true);
-                    window.center();
-                }
-                else {
-
-                    SafeHtmlBuilder html = new SafeHtmlBuilder();
-                    html.appendHtmlConstant(Console.CONSTANTS.subsys_jca_datasource_error_loadDriver_desc());
-                    Feedback.alert(Console.CONSTANTS.subsys_jca_datasource_error_loadDriver(), html.toSafeHtml());
-                }
-            }
-        });
-    }
-
-    public void loadDriver(final AsyncCallback<List<JDBCDriver>> callback) {
-        driverRegistry.refreshDrivers(new SimpleCallback<List<JDBCDriver>>() {
-            @Override
-            public void onSuccess(List<JDBCDriver> drivers) {
-
-                callback.onSuccess(drivers);
-            }
-        });
     }
 
     public void launchNewXADatasourceWizard() {
 
-        driverRegistry.refreshDrivers(new SimpleCallback<List<JDBCDriver>>() {
-            @Override
-            public void onSuccess(List<JDBCDriver> drivers) {
-
-                if(drivers.size()>0)
-                {
-                    window = new DefaultWindow(Console.MESSAGES.createTitle("XA Datasource"));
-                    window.setWidth(480);
-                    window.setHeight(450);
-                    window.addCloseHandler(new CloseHandler<PopupPanel>() {
-                        @Override
-                        public void onClose(CloseEvent<PopupPanel> event) {
-
-                        }
-                    });
-
-                    window.setWidget(
-                            new NewXADatasourceWizard(DataSourcePresenter.this, drivers, bootstrap).asWidget()
-                    );
-
-                    window.setGlassEnabled(true);
-                    window.center();
-                }
-                else {
-                    SafeHtmlBuilder html = new SafeHtmlBuilder();
-                    html.appendHtmlConstant(Console.CONSTANTS.subsys_jca_datasource_error_loadDriver_desc());
-                    Feedback.alert(Console.CONSTANTS.subsys_jca_datasource_error_loadDriver(), html.toSafeHtml());
-                }
-            }
-        });
-
+        window = new DefaultWindow(Console.MESSAGES.createTitle("XA Datasource"));
+        window.setWidth(480);
+        window.setHeight(450);
+        window.setWidget(
+                new NewXADatasourceWizard(DataSourcePresenter.this, drivers, xaDatasources, bootstrap)
+                        .asWidget());
+        window.setGlassEnabled(true);
+        window.center();
     }
-
 
     public void onCreateDatasource(final DataSource datasource) {
         window.hide();
@@ -257,6 +271,7 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         });
 
     }
+
 
     public void onDelete(final DataSource entity) {
 
@@ -335,7 +350,6 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         }
     }
 
-
     public void onCreateXADatasource(final XADataSource updatedEntity) {
         window.hide();
 
@@ -360,6 +374,7 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
             }
         });
     }
+
 
     public void onDisableXA(final XADataSource entity, boolean doEnable) {
         dataSourceStore.enableXADataSource(entity, doEnable, new SimpleCallback<ResponseWrapper<Boolean>>()
@@ -438,7 +453,6 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         });
     }
 
-
     public void loadXAProperties(final String dataSourceName) {
         dataSourceStore.loadXAProperties(dataSourceName, new SimpleCallback<List<PropertyRecord>>()
         {
@@ -448,6 +462,7 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
             }
         });
     }
+
 
     public void onCreateXAProperty(final String reference, final PropertyRecord prop) {
 
@@ -528,18 +543,13 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
         propertyWindow.hide();
     }
 
-    public void verifyConnection(final String dataSourceName, boolean isXA) {
-
-        dataSourceStore.verifyConnection(dataSourceName, isXA, new SimpleCallback<ResponseWrapper<Boolean>>() {
+    public void verifyConnection(final DataSource dataSource, boolean xa, boolean existing) {
+        VerifyConnectionOp vop = new VerifyConnectionOp(dataSourceStore, dispatcher, beanFactory,
+                currentProfileSelection.getName());
+        vop.execute(dataSource, xa, existing, new SimpleCallback<VerifyResult>() {
             @Override
-            public void onSuccess(ResponseWrapper<Boolean> response) {
-
-                if(response.getUnderlying())
-                    Console.info(Console.MESSAGES.successful("Connection settings: "+ dataSourceName));
-                else
-                    Console.error(Console.MESSAGES.failed( "Connection settings: "+ dataSourceName), response.getResponse().toString());
-
-                getView().setConnectionVerified(response.getUnderlying(), dataSourceName);
+            public void onSuccess(final VerifyResult result) {
+                getView().showVerifyConncectionResult(dataSource.getName(), result);
             }
         });
     }
@@ -622,5 +632,6 @@ public class DataSourcePresenter extends Presenter<DataSourcePresenter.MyView, D
             }
         });
     }
+
 
 }
