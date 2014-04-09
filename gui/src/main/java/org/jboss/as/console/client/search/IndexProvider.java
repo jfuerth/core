@@ -37,23 +37,27 @@ import com.google.inject.Provider;
 @ApplicationScoped
 public class IndexProvider implements Provider<Index> {
 
-    private final String prefix;
     private final BeanFactory beanFactory;
+    private final BootstrapContext bootstrapContext;
+    private final ModelVersions modelVersions;
 
     @Inject
     public IndexProvider(final BeanFactory beanFactory, final BootstrapContext bootstrapContext,
             final ModelVersions modelVersions) {
         this.beanFactory = beanFactory;
-        String operationMode = bootstrapContext.isStandalone() ? "standalone" : "domain";
-        String locale = Preferences.get(Preferences.Key.LOCALE) == null ? "default" : Preferences
-                .get(Preferences.Key.LOCALE);
-        this.prefix = "org.jboss.as.console.index_" + operationMode + "_" + locale + "_v" + modelVersions
-                .get("core-version") + "_";
+        this.bootstrapContext = bootstrapContext;
+        this.modelVersions = modelVersions;
     }
 
     @Produces
     @Override
     public Index get() {
+        String operationMode = bootstrapContext.isStandalone() ? "standalone" : "domain";
+        String locale = Preferences.get(Preferences.Key.LOCALE) == null
+                ? "default"
+                : Preferences.get(Preferences.Key.LOCALE);
+        String prefix = "org.jboss.as.console.index_" + operationMode + "_" + locale + "_v"
+                + modelVersions.get("core-version") + "_";
         return new Index(prefix, beanFactory);
     }
 }

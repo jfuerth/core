@@ -35,7 +35,6 @@ import org.jboss.as.console.client.core.Header;
 import org.jboss.as.console.client.core.MainLayoutPresenter;
 import org.jboss.as.console.client.core.MainLayoutViewImpl;
 import org.jboss.as.console.client.core.NewTokenFormatter;
-import org.jboss.as.console.client.core.ToplevelTabs;
 import org.jboss.as.console.client.core.message.MessageBar;
 import org.jboss.as.console.client.core.message.MessageCenter;
 import org.jboss.as.console.client.core.message.MessageCenterImpl;
@@ -85,9 +84,6 @@ import org.jboss.as.console.client.rbac.RBACGatekeeper;
 import org.jboss.as.console.client.rbac.SecurityFramework;
 import org.jboss.as.console.client.rbac.UnauthorisedPresenter;
 import org.jboss.as.console.client.rbac.UnauthorisedView;
-import org.jboss.as.console.client.search.Harvest;
-import org.jboss.as.console.client.search.Index;
-import org.jboss.as.console.client.search.IndexProvider;
 import org.jboss.as.console.client.shared.DialogPresenter;
 import org.jboss.as.console.client.shared.DialogView;
 import org.jboss.as.console.client.shared.DialogViewImpl;
@@ -258,9 +254,6 @@ public class CoreUIModule extends AbstractPresenterModule {
         requestStaticInjection(RuntimeBaseAddress.class);
         requestStaticInjection(Baseadress.class);
 
-        bind(Harvest.class).in(Singleton.class);
-        bind(Index.class).toProvider(IndexProvider.class).in(Singleton.class);
-
         // main layout
         bind(Header.class).toProvider(ErraiHeaderProvider.class);
         bind(Footer.class).toProvider(ErraiFooterProvider.class);
@@ -310,7 +303,6 @@ public class CoreUIModule extends AbstractPresenterModule {
 
         bind(DomainEntityManager.class).toProvider(ErraiDomainEntityManagerProvider.class);
         bind(PatchManager.class).in(Singleton.class);
-        bind(ToplevelTabs.class).in(Singleton.class);
 
         // sign in
         bindPresenter(SignInPagePresenter.class, SignInPagePresenter.MyView.class,

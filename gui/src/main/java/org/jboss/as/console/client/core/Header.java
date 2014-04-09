@@ -22,6 +22,7 @@ package org.jboss.as.console.client.core;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.ProductConfig;
@@ -71,20 +72,21 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 public class Header implements ValueChangeHandler<String>, org.uberfire.client.workbench.Header {
 
     private final FeatureSet featureSet;
-    private final ToplevelTabs toplevelTabs;
+    private final Instance<ToplevelTabs> toplevelTabs;
     private final ProductConfig productConfig;
     private final BootstrapContext bootstrap;
     private final MessageCenter messageCenter;
     private final PlaceManager placeManager;
     private final Harvest harvest;
-    private final Index index;
+    private final Instance<Index> index;
 
     private HTMLPanel linksPane;
     private String currentHighlightedSection = null;
 
     @Inject
-    public Header(final FeatureSet featureSet, final ToplevelTabs toplevelTabs, MessageCenter messageCenter,
-            @POC ProductConfig productConfig, BootstrapContext bootstrap, @POC PlaceManager placeManager, Harvest harvest, Index index) {
+    public Header(final FeatureSet featureSet, final Instance<ToplevelTabs> toplevelTabs, MessageCenter messageCenter,
+            @POC ProductConfig productConfig, BootstrapContext bootstrap, @POC PlaceManager placeManager, Harvest harvest,
+            Instance<Index> index) {
         this.featureSet = featureSet;
         this.toplevelTabs = toplevelTabs;
         this.messageCenter = messageCenter;
@@ -155,7 +157,7 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         // global search
         if (featureSet.isSearchEnabled()) {
             if (Storage.isLocalStorageSupported()) {
-                tools.add(new SearchTool(harvest, index, placeManager));
+                tools.add(new SearchTool(harvest, index.get(), placeManager));
             }
         }
 
@@ -317,12 +319,14 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
     }
 
     private Widget getLinksSection() {
-        linksPane = new HTMLPanel(createLinks());
+        ToplevelTabs tabs = toplevelTabs.get();
+
+        linksPane = new HTMLPanel(createLinks(tabs));
         linksPane.getElement().setId("header-links-section");
         linksPane.getElement().setAttribute("role", "menubar");
         linksPane.getElement().setAttribute("aria-controls", "main-content-area");
 
-        for (final ToplevelTabs.Config tlt : toplevelTabs) {
+        for (final ToplevelTabs.Config tlt : tabs) {
             final String id = "header-" + tlt.getToken();
 
             SafeHtmlBuilder html = new SafeHtmlBuilder();
@@ -351,17 +355,17 @@ public class Header implements ValueChangeHandler<String>, org.uberfire.client.w
         return linksPane;
     }
 
-    private String createLinks() {
+    private String createLinks(ToplevelTabs tabs) {
 
         SafeHtmlBuilder headerString = new SafeHtmlBuilder();
 
-        if (!toplevelTabs.isEmpty()) {
+        if (!tabs.isEmpty()) {
             headerString
                     .appendHtmlConstant("<table border=0 class='header-links' cellpadding=0 cellspacing=0 border=0>");
             headerString.appendHtmlConstant("<tr id='header-links-ref'>");
 
             headerString.appendHtmlConstant("<td><img src=\"images/blank.png\" width=1/></td>");
-            for (ToplevelTabs.Config tlt : toplevelTabs) {
+            for (ToplevelTabs.Config tlt : tabs) {
                 final String id = "header-" + tlt.getToken();
                 String styleClass = "header-link";
                 String styleAtt = "vertical-align:middle; text-align:center";

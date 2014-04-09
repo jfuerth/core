@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.as.console.client.Console;
@@ -43,12 +44,12 @@ public class Harvest {
     private final SearchIndexRegistry searchIndexRegistry;
     private final DispatchAsync dispatcher;
     private final BootstrapContext bootstrap;
-    private final Index index;
+    private final Instance<Index> index;
     private final FilteringStatementContext filteringStatementContext;
 
     @Inject
     public Harvest(SearchIndexRegistry searchIndexRegistry, DispatchAsync dispatcher,
-            CoreGUIContext statementContext, final BootstrapContext bootstrap, Index index) {
+            CoreGUIContext statementContext, final BootstrapContext bootstrap, Instance<Index> index) {
 
         this.searchIndexRegistry = searchIndexRegistry;
         this.dispatcher = dispatcher;
@@ -130,7 +131,7 @@ public class Harvest {
                                         } else {
                                             String address = op.get(ADDRESS).asString();
                                             if (handler.shouldHarvest(token, address, description)) {
-                                                index.add(token, keywords, description);
+                                                index.get().add(token, keywords, description);
                                                 handler.onHarvest(token, address, description);
                                             } else {
                                                 System.out.println("Denied by harvest handler " + token + " > " + resource);

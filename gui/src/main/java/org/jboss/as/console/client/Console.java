@@ -24,7 +24,6 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.jboss.as.console.client.core.AsyncCallHandler;
@@ -97,8 +96,8 @@ public class Console implements ReloadNotification.Handler {
     public final static UIDebugConstants DEBUG_CONSTANTS = GWT.create(UIDebugConstants.class);
     public final static UIMessages MESSAGES = GWT.create(UIMessages.class);
 
-    @Produces
-    private final ApplicationMetaData applicationMetaData = GWT.create(ApplicationMetaData.class);
+    @Inject
+    private ApplicationMetaData applicationMetaData;
 
     @Inject
     private Workbench workbench;

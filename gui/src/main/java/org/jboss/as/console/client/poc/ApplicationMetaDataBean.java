@@ -36,10 +36,10 @@ import com.google.gwt.core.client.GWT;
  *
  * @author Stan Silvert ssilvert@redhat.com (C) 2014 Red Hat Inc.
  */
-@ApplicationScoped @POC
-public class ApplicationMetaDataPOC implements ApplicationMetaData {
+@ApplicationScoped
+public class ApplicationMetaDataBean implements ApplicationMetaData {
 
-    private static final ApplicationMetaData generated = GWT.create(ApplicationMetaData.class); //new org.jboss.as.console.client.widgets.forms.ApplicationMetaDataImpl();
+    private final ApplicationMetaData generated = GWT.create(ApplicationMetaData.class);
 
     @Override
     public List<PropertyBinding> getBindingsForType(Class<?> type) {
